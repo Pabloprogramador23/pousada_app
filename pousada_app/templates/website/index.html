@@ -1,0 +1,247 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Pousada Pajeu - Sua melhor estadia em Serra Talhada{% endblock %}
+
+{% block content %}
+<!-- Banner Principal -->
+<section class="banner">
+    <img src="{% static 'img/banner.jpg' %}" alt="Pousada Pajeu" class="banner-img">
+    <div class="banner-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1>Bem-vindo à Pousada Pajeu</h1>
+                    <p>Conforto, tranquilidade e excelente localização em Serra Talhada, Pernambuco.</p>
+                    <a href="{% url 'reservas:criar' %}" class="btn btn-warning btn-lg">Reservar Agora</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quartos em Destaque -->
+<section id="quartos-destaque" class="section bg-light">
+    <div class="container">
+        <h2 class="section-title">Nossos Quartos</h2>
+        <p class="text-center mb-5">Conheça nossas opções de acomodações confortáveis e bem equipadas</p>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="{% static 'img/quarto-standard.jpg' %}" class="card-img-top" alt="Quarto Standard">
+                    <div class="card-body">
+                        <h5 class="card-title">Quarto Standard</h5>
+                        <p class="card-text">Quarto confortável com cama de casal, ar-condicionado, TV e banheiro privativo.</p>
+                        <p class="card-price mb-3">A partir de R$ 120,00</p>
+                        <a href="{% url 'website:quartos_lista' %}" class="btn btn-outline-primary">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="{% static 'img/quarto-luxo.jpg' %}" class="card-img-top" alt="Quarto Luxo">
+                    <div class="card-body">
+                        <h5 class="card-title">Quarto Luxo</h5>
+                        <p class="card-text">Quarto amplo com cama king size, ar-condicionado, smart TV e banheira.</p>
+                        <p class="card-price mb-3">A partir de R$ 180,00</p>
+                        <a href="{% url 'website:quartos_lista' %}" class="btn btn-outline-primary">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="{% static 'img/suite-familia.jpg' %}" class="card-img-top" alt="Suíte Família">
+                    <div class="card-body">
+                        <h5 class="card-title">Suíte Família</h5>
+                        <p class="card-text">Suíte espaçosa com cama de casal e duas de solteiro, ideal para famílias.</p>
+                        <p class="card-price mb-3">A partir de R$ 250,00</p>
+                        <a href="{% url 'website:quartos_lista' %}" class="btn btn-outline-primary">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'website:quartos_lista' %}" class="btn btn-primary">Ver Todos os Quartos</a>
+        </div>
+    </div>
+</section>
+
+<!-- Recursos -->
+<section id="recursos" class="section">
+    <div class="container">
+        <h2 class="section-title">Nossa Estrutura</h2>
+        <p class="text-center mb-5">Oferecemos uma experiência completa para sua estadia</p>
+        
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="feature-icon">
+                    <i class="fas fa-wifi"></i>
+                </div>
+                <h4>Wi-Fi Gratuito</h4>
+                <p>Internet de alta velocidade disponível em todas as áreas da pousada.</p>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="feature-icon">
+                    <i class="fas fa-coffee"></i>
+                </div>
+                <h4>Café da Manhã</h4>
+                <p>Delicioso café da manhã incluso com variedades da culinária regional.</p>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="feature-icon">
+                    <i class="fas fa-parking"></i>
+                </div>
+                <h4>Estacionamento</h4>
+                <p>Estacionamento privativo e seguro para todos os hóspedes.</p>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="feature-icon">
+                    <i class="fas fa-swimming-pool"></i>
+                </div>
+                <h4>Piscina</h4>
+                <p>Piscina refrescante para relaxar depois de um dia de passeios.</p>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="feature-icon">
+                    <i class="fas fa-concierge-bell"></i>
+                </div>
+                <h4>Recepção 24h</h4>
+                <p>Atendimento 24 horas para garantir sua comodidade.</p>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="feature-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <h4>Restaurante</h4>
+                <p>Restaurante com pratos regionais e internacionais.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sobre Nós -->
+<section id="sobre" class="section bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <img src="{% static 'img/pousada-fachada.jpg' %}" alt="Fachada da Pousada Pajeu" class="img-fluid rounded">
+            </div>
+            <div class="col-lg-6">
+                <h2 class="section-title text-start">Sobre a Pousada Pajeu</h2>
+                <p>A Pousada Pajeu está localizada no coração de Serra Talhada, oferecendo o equilíbrio perfeito entre conforto, praticidade e hospitalidade nordestina.</p>
+                <p>Nossa história começou em 2010, com o sonho de oferecer uma hospedagem que destacasse o melhor da cultura sertaneja com o conforto que nossos hóspedes merecem.</p>
+                <p>Situados a apenas 5 minutos do centro da cidade, estamos próximos aos principais pontos turísticos e comerciais, proporcionando uma experiência conveniente para viajantes a negócios e turistas.</p>
+                <a href="{% url 'website:sobre' %}" class="btn btn-primary mt-3">Conheça Nossa História</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Depoimentos -->
+<section id="depoimentos" class="section">
+    <div class="container">
+        <h2 class="section-title">O que Dizem Nossos Hóspedes</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="card-text">"Ótima estadia! Quartos muito confortáveis, café da manhã delicioso e equipe super atenciosa. Voltarei com certeza na próxima vez que estiver em Serra Talhada."</p>
+                        <p class="card-text text-end"><strong>Maria Silva</strong></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="card-text">"Localização perfeita para quem está a negócios. Estacionamento seguro, Wi-Fi excelente e o atendimento supera as expectativas. Recomendo!"</p>
+                        <p class="card-text text-end"><strong>João Santos</strong></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                        </div>
+                        <p class="card-text">"Hospedagem familiar com excelente custo-benefício. A piscina é ótima para relaxar e as refeições são muito saborosas. Os funcionários são muito prestativos."</p>
+                        <p class="card-text text-end"><strong>Ana Oliveira</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chamada para Ação -->
+<section class="section bg-primary text-white">
+    <div class="container text-center">
+        <h2>Pronto para uma estadia inesquecível?</h2>
+        <p class="lead mb-4">Reserve agora e aproveite as melhores tarifas com café da manhã incluso!</p>
+        <a href="{% url 'reservas:criar' %}" class="btn btn-warning btn-lg">Fazer Minha Reserva</a>
+    </div>
+</section>
+
+<!-- Localização -->
+<section id="localizacao" class="section">
+    <div class="container">
+        <h2 class="section-title">Nossa Localização</h2>
+        <p class="text-center mb-5">Estamos estrategicamente localizados no centro de Serra Talhada</p>
+        
+        <div class="row">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <div class="ratio ratio-16x9">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31608.737440988675!2d-38.31642236715819!3d-7.9867693999999895!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7a740022f8afa33%3A0x81c26d502877292c!2sSerra%20Talhada%2C%20PE!5e0!3m2!1spt-BR!2sbr!4v1690224013825!5m2!1spt-BR!2sbr" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h4>Como Chegar</h4>
+                <p><i class="fas fa-map-marker-alt text-primary me-2"></i> Rua Principal, 123 - Centro, Serra Talhada - PE, 56900-000</p>
+                <p><i class="fas fa-phone text-primary me-2"></i> (87) 3831-0000</p>
+                <p><i class="fas fa-envelope text-primary me-2"></i> contato@pousadapajeu.com.br</p>
+                
+                <h5 class="mt-4">Pontos de Referência:</h5>
+                <ul>
+                    <li>5 minutos do centro comercial</li>
+                    <li>10 minutos da rodoviária</li>
+                    <li>15 minutos do Parque Estadual</li>
+                    <li>Próximo ao Shopping Serra Talhada</li>
+                </ul>
+                
+                <a href="https://goo.gl/maps/123" target="_blank" class="btn btn-outline-primary mt-3">
+                    <i class="fas fa-directions me-2"></i>Como Chegar
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

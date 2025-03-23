@@ -1,0 +1,244 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Sobre Nós - Pousada Pajeu{% endblock %}
+
+{% block content %}
+<!-- Banner da Página -->
+<section class="banner">
+    <img src="{% static 'img/banner-sobre.jpg' %}" alt="Sobre a Pousada Pajeu" class="banner-img">
+    <div class="banner-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1>Sobre Nós</h1>
+                    <p>Conheça a história e os valores da Pousada Pajeu</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- História -->
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="section-title">Nossa História</h2>
+                <p class="lead mb-4">Uma trajetória de hospitalidade e dedicação</p>
+            </div>
+        </div>
+        
+        <div class="row align-items-center mb-5">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <img src="{% static 'img/pousada-historia.jpg' %}" alt="História da Pousada" class="img-fluid rounded">
+            </div>
+            <div class="col-lg-6">
+                <h3>Como tudo começou</h3>
+                <p>A Pousada Pajeu nasceu em 2010, do sonho de uma família sertaneja que sempre teve o desejo de proporcionar uma experiência de hospedagem que combinasse o acolhimento característico do nordestino com o conforto e a qualidade que os visitantes de Serra Talhada merecem.</p>
+                <p>Fundada pelos irmãos Silva, naturais da região, a pousada começou com apenas 5 quartos e, ao longo dos anos, foi se expandindo até chegar à estrutura atual, com 25 acomodações confortáveis e uma série de comodidades para os hóspedes.</p>
+                <p>O nome "Pajeu" é uma homenagem ao rio que corta a região e que representa a força e a perseverança do povo sertanejo, valores que são fundamentais para a nossa filosofia de trabalho.</p>
+            </div>
+        </div>
+        
+        <div class="row align-items-center mb-5 flex-lg-row-reverse">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <img src="{% static 'img/pousada-valores.jpg' %}" alt="Nossos Valores" class="img-fluid rounded">
+            </div>
+            <div class="col-lg-6">
+                <h3>Nossos Valores</h3>
+                <p>Na Pousada Pajeu, acreditamos que a hospitalidade vai além de simplesmente oferecer um lugar para dormir. Nossa missão é proporcionar uma experiência memorável, onde cada hóspede se sinta em casa mesmo estando longe dela.</p>
+                <p>Valorizamos o atendimento personalizado, a limpeza impecável, a segurança e o conforto em cada detalhe. Trabalhamos constantemente para melhorar nossos serviços e superar as expectativas dos nossos hóspedes.</p>
+                <p>Além disso, temos um forte compromisso com a sustentabilidade e com o desenvolvimento da comunidade local, priorizando fornecedores da região e adotando práticas ecoamigáveis em nossas operações diárias.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Estrutura -->
+<section class="section bg-light">
+    <div class="container">
+        <h2 class="section-title">Nossa Estrutura</h2>
+        <p class="text-center mb-5">Conforto e conveniência para sua estadia</p>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="{% static 'img/recepcao.jpg' %}" class="card-img-top" alt="Recepção">
+                    <div class="card-body">
+                        <h5 class="card-title">Recepção 24 Horas</h5>
+                        <p class="card-text">Nossa equipe está sempre pronta para atender suas necessidades a qualquer hora do dia ou da noite, garantindo assistência contínua durante toda a sua estadia.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="{% static 'img/cafe-manha.jpg' %}" class="card-img-top" alt="Café da Manhã">
+                    <div class="card-body">
+                        <h5 class="card-title">Café da Manhã Regional</h5>
+                        <p class="card-text">Desfrute de um delicioso café da manhã com produtos frescos e típicos da culinária nordestina, servido diariamente em nosso restaurante.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="{% static 'img/piscina.jpg' %}" class="card-img-top" alt="Piscina">
+                    <div class="card-body">
+                        <h5 class="card-title">Piscina Refrescante</h5>
+                        <p class="card-text">Relaxe e refresque-se em nossa piscina, perfeita para combater o calor do sertão após um dia de passeios ou trabalho.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="{% static 'img/estacionamento.jpg' %}" class="card-img-top" alt="Estacionamento">
+                    <div class="card-body">
+                        <h5 class="card-title">Estacionamento Seguro</h5>
+                        <p class="card-text">Estacionamento privativo e monitorado 24 horas, garantindo a segurança do seu veículo durante toda sua hospedagem.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="{% static 'img/wifi.jpg' %}" class="card-img-top" alt="Wi-Fi">
+                    <div class="card-body">
+                        <h5 class="card-title">Wi-Fi de Alta Velocidade</h5>
+                        <p class="card-text">Internet gratuita e de alta velocidade em todas as áreas da pousada, para que você possa se manter conectado durante sua estadia.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="{% static 'img/restaurante.jpg' %}" class="card-img-top" alt="Restaurante">
+                    <div class="card-body">
+                        <h5 class="card-title">Restaurante</h5>
+                        <p class="card-text">Nosso restaurante oferece pratos da culinária regional e internacional, preparados com ingredientes frescos e de qualidade.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Equipe -->
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Nossa Equipe</h2>
+        <p class="text-center mb-5">Profissionais dedicados a tornar sua estadia memorável</p>
+        
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4 text-center">
+                <div class="rounded-circle overflow-hidden mx-auto mb-3" style="width: 180px; height: 180px;">
+                    <img src="{% static 'img/gerente.jpg' %}" alt="Gerente" class="img-fluid">
+                </div>
+                <h4>João Silva</h4>
+                <p class="text-muted">Gerente Geral</p>
+                <p>Com mais de 15 anos de experiência em hotelaria, João é responsável por garantir que tudo funcione perfeitamente para proporcionar a melhor experiência aos nossos hóspedes.</p>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4 text-center">
+                <div class="rounded-circle overflow-hidden mx-auto mb-3" style="width: 180px; height: 180px;">
+                    <img src="{% static 'img/recepcao-chefe.jpg' %}" alt="Chefe de Recepção" class="img-fluid">
+                </div>
+                <h4>Maria Oliveira</h4>
+                <p class="text-muted">Chefe de Recepção</p>
+                <p>Com seu sorriso acolhedor e atendimento impecável, Maria lidera nossa equipe de recepção, sempre pronta para atender às necessidades de cada hóspede.</p>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4 text-center">
+                <div class="rounded-circle overflow-hidden mx-auto mb-3" style="width: 180px; height: 180px;">
+                    <img src="{% static 'img/chef.jpg' %}" alt="Chef" class="img-fluid">
+                </div>
+                <h4>Pedro Santos</h4>
+                <p class="text-muted">Chef</p>
+                <p>Especialista em culinária regional, Pedro traz para nossa cozinha o melhor dos sabores do sertão pernambucano, com um toque contemporâneo que encanta os paladares.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Depoimentos -->
+<section class="section bg-light">
+    <div class="container">
+        <h2 class="section-title">Depoimentos</h2>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left fa-2x text-primary opacity-25"></i>
+                        </div>
+                        <p class="card-text">"Me hospedo na Pousada Pajeu sempre que venho a trabalho para Serra Talhada. A localização é perfeita, os quartos são confortáveis e o atendimento é excepcional. Já considero minha segunda casa na cidade."</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <div class="flex-shrink-0">
+                                <img src="{% static 'img/depoimento1.jpg' %}" alt="Depoimento" class="rounded-circle" width="50" height="50">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="mb-0">Carlos Mendes</h5>
+                                <p class="text-muted mb-0">Empresário - Recife, PE</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left fa-2x text-primary opacity-25"></i>
+                        </div>
+                        <p class="card-text">"Viajamos em família e ficamos encantados com a Pousada Pajeu. A suíte família é espaçosa e aconchegante, o café da manhã é delicioso e as crianças adoraram a piscina. Recomendo a todos que visitarem Serra Talhada!"</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <div class="flex-shrink-0">
+                                <img src="{% static 'img/depoimento2.jpg' %}" alt="Depoimento" class="rounded-circle" width="50" height="50">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="mb-0">Ana e Paulo Rodrigues</h5>
+                                <p class="text-muted mb-0">Família - João Pessoa, PB</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Parceiros -->
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Nossos Parceiros</h2>
+        <p class="text-center mb-5">Empresas e instituições que confiam em nossos serviços</p>
+        
+        <div class="row align-items-center text-center">
+            <div class="col-md-3 col-6 mb-4">
+                <img src="{% static 'img/parceiro1.png' %}" alt="Parceiro 1" class="img-fluid" style="max-height: 80px;">
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <img src="{% static 'img/parceiro2.png' %}" alt="Parceiro 2" class="img-fluid" style="max-height: 80px;">
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <img src="{% static 'img/parceiro3.png' %}" alt="Parceiro 3" class="img-fluid" style="max-height: 80px;">
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <img src="{% static 'img/parceiro4.png' %}" alt="Parceiro 4" class="img-fluid" style="max-height: 80px;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chamada para Ação -->
+<section class="section bg-primary text-white">
+    <div class="container text-center">
+        <h2>Venha conhecer a Pousada Pajeu</h2>
+        <p class="lead mb-4">Reserve agora e descubra por que somos a melhor opção de hospedagem em Serra Talhada!</p>
+        <a href="{% url 'reservas:nova_reserva' %}" class="btn btn-warning btn-lg">Fazer Minha Reserva</a>
+    </div>
+</section>
+{% endblock %} 

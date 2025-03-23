@@ -1,0 +1,343 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Nova Reserva - Pousada Pajeu{% endblock %}
+
+{% block content %}
+<!-- Banner da Página -->
+<section class="banner">
+    <img src="{% static 'img/banner-reserva.jpg' %}" alt="Reserva Pousada Pajeu" class="banner-img">
+    <div class="banner-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1>Faça sua Reserva</h1>
+                    <p>Preencha o formulário abaixo para solicitar sua reserva</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Formulário de Reserva -->
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="card-title text-center mb-4">Formulário de Reserva</h2>
+                        
+                        {% if messages %}
+                        <div class="alert alert-info">
+                            {% for message in messages %}
+                                {{ message }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h4 class="mb-3"><i class="fas fa-calendar-alt text-primary me-2"></i> Datas e Quartos</h4>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="check_in" class="form-label">Data de Check-in</label>
+                                    <input type="date" class="form-control" id="check_in" name="check_in" required min="{{ today|date:'Y-m-d' }}">
+                                    <div class="invalid-feedback">
+                                        Por favor, selecione uma data de check-in válida.
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="check_out" class="form-label">Data de Check-out</label>
+                                    <input type="date" class="form-control" id="check_out" name="check_out" required min="{{ tomorrow|date:'Y-m-d' }}">
+                                    <div class="invalid-feedback">
+                                        Por favor, selecione uma data de check-out válida.
+                                    </div>
+                                    <div class="form-text">O check-out deve ser posterior ao check-in.</div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <label for="quarto" class="form-label">Tipo de Quarto</label>
+                                    <select class="form-select" id="quarto" name="quarto" required>
+                                        <option value="">Selecione um tipo de quarto</option>
+                                        {% for quarto in quartos %}
+                                        <option value="{{ quarto.id }}" 
+                                                data-preco="{{ quarto.preco_diaria }}" 
+                                                data-capacidade="{{ quarto.capacidade_maxima }}"
+                                                {% if tipo_quarto == quarto.tipo %}selected{% endif %}>
+                                            {{ quarto.nome }} - R$ {{ quarto.preco_diaria }}
+                                        </option>
+                                        {% empty %}
+                                        <option value="1" data-preco="120" data-capacidade="2">Quarto Standard - R$ 120,00</option>
+                                        <option value="2" data-preco="180" data-capacidade="2">Quarto Luxo - R$ 180,00</option>
+                                        <option value="3" data-preco="250" data-capacidade="4">Suíte Família - R$ 250,00</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Por favor, selecione um tipo de quarto.
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="adultos" class="form-label">Adultos</label>
+                                    <select class="form-select" id="adultos" name="adultos" required>
+                                        <option value="1">1 adulto</option>
+                                        <option value="2" selected>2 adultos</option>
+                                        <option value="3">3 adultos</option>
+                                        <option value="4">4 adultos</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="criancas" class="form-label">Crianças</label>
+                                    <select class="form-select" id="criancas" name="criancas">
+                                        <option value="0" selected>Nenhuma</option>
+                                        <option value="1">1 criança</option>
+                                        <option value="2">2 crianças</option>
+                                        <option value="3">3 crianças</option>
+                                    </select>
+                                    <div class="form-text">Até 6 anos não pagam.</div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h4 class="mb-3"><i class="fas fa-user text-primary me-2"></i> Informações do Hóspede</h4>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="nome" class="form-label">Nome Completo</label>
+                                    <input type="text" class="form-control" id="nome" name="nome" required>
+                                    <div class="invalid-feedback">
+                                        Por favor, informe seu nome completo.
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">E-mail</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                    <div class="invalid-feedback">
+                                        Por favor, informe um e-mail válido.
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="telefone" class="form-label">Telefone</label>
+                                    <input type="text" class="form-control telefone-mask" id="telefone" name="telefone" required>
+                                    <div class="invalid-feedback">
+                                        Por favor, informe um telefone válido.
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="cpf" class="form-label">CPF</label>
+                                    <input type="text" class="form-control" id="cpf" name="cpf" required>
+                                    <div class="invalid-feedback">
+                                        Por favor, informe um CPF válido.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h4 class="mb-3"><i class="fas fa-sticky-note text-primary me-2"></i> Observações</h4>
+                                
+                                <div class="mb-3">
+                                    <label for="observacoes" class="form-label">Alguma solicitação especial?</label>
+                                    <textarea class="form-control" id="observacoes" name="observacoes" rows="3" maxlength="500"></textarea>
+                                    <div class="form-text">Informe aqui qualquer necessidade especial, solicitação, restrição alimentar, etc.</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Resumo da Reserva -->
+                            <div id="resumo_reserva" class="card mb-4 bg-light">
+                                <div class="card-body">
+                                    <h4 class="card-title">Resumo da Reserva</h4>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2">
+                                            <strong>Check-in:</strong> <span id="resumo_checkin"></span>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <strong>Check-out:</strong> <span id="resumo_checkout"></span>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <strong>Quarto:</strong> <span id="resumo_quarto"></span>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <strong>Hóspedes:</strong> <span id="resumo_hospedes"></span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <div><strong>Valor Total da Reserva:</strong></div>
+                                        <div class="h4 mb-0"><span id="preco_total">R$ 0,00</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="politica_privacidade" name="politica_privacidade" required>
+                                <label class="form-check-label" for="politica_privacidade">
+                                    Concordo com os <a href="#" data-bs-toggle="modal" data-bs-target="#modalTermos">termos e condições</a> e a <a href="#" data-bs-toggle="modal" data-bs-target="#modalPrivacidade">política de privacidade</a>.
+                                </label>
+                                <div class="invalid-feedback">
+                                    Você deve concordar com os termos para prosseguir.
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">Solicitar Reserva</button>
+                                <p class="text-center mt-2 text-muted small">Após o envio, entraremos em contato para confirmar sua reserva e informar sobre o pagamento.</p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Informações Importantes</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-info-circle text-primary me-2"></i> Check-in: a partir das 14h</li>
+                            <li class="mb-2"><i class="fas fa-info-circle text-primary me-2"></i> Check-out: até as 12h</li>
+                            <li class="mb-2"><i class="fas fa-info-circle text-primary me-2"></i> Para confirmar a reserva, solicitamos um pré-pagamento de 30%</li>
+                            <li><i class="fas fa-info-circle text-primary me-2"></i> Cancelamentos gratuitos até 7 dias antes do check-in</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Dúvidas?</h5>
+                        <p>Entre em contato conosco:</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-phone text-primary me-2"></i> (87) 3831-0000</li>
+                            <li class="mb-2"><i class="fas fa-envelope text-primary me-2"></i> reservas@pousadapajeu.com.br</li>
+                            <li><i class="fab fa-whatsapp text-primary me-2"></i> (87) 99999-0000</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal Termos e Condições -->
+<div class="modal fade" id="modalTermos" tabindex="-1" aria-labelledby="modalTermosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTermosLabel">Termos e Condições</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h5>1. Reservas</h5>
+                <p>Para confirmar sua reserva, solicitamos um pré-pagamento de 30% do valor total da estadia. O restante deverá ser pago no momento do check-in.</p>
+                
+                <h5>2. Política de Cancelamento</h5>
+                <p>Cancelamentos realizados até 7 dias antes da data de check-in terão devolução integral do valor pago. Cancelamentos entre 6 e 3 dias antes terão devolução de 50%. Cancelamentos com menos de 3 dias de antecedência não terão direito a reembolso.</p>
+                
+                <h5>3. Check-in e Check-out</h5>
+                <p>O check-in é realizado a partir das 14h e o check-out até as 12h. Early check-in e late check-out estão sujeitos à disponibilidade e podem implicar cobrança adicional.</p>
+                
+                <h5>4. Regras da Pousada</h5>
+                <p>Não é permitido fumar nas acomodações. Não são permitidos animais de estimação. Festas e eventos apenas com autorização prévia da administração.</p>
+                
+                <h5>5. Danos e Perdas</h5>
+                <p>O hóspede é responsável por quaisquer danos ou perdas causados às instalações e equipamentos da pousada durante sua estadia.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Política de Privacidade -->
+<div class="modal fade" id="modalPrivacidade" tabindex="-1" aria-labelledby="modalPrivacidadeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalPrivacidadeLabel">Política de Privacidade</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h5>1. Coleta de Dados</h5>
+                <p>Coletamos informações pessoais como nome, endereço, e-mail, telefone e documentos de identificação para fins de reserva, registro obrigatório conforme legislação e comunicação relacionada à sua estadia.</p>
+                
+                <h5>2. Uso das Informações</h5>
+                <p>As informações coletadas são utilizadas para processar reservas, melhorar nossos serviços, enviar confirmações, avisos de pagamento e comunicações relacionadas à sua estadia.</p>
+                
+                <h5>3. Compartilhamento de Dados</h5>
+                <p>Seus dados não serão vendidos ou compartilhados com terceiros para fins de marketing. Podemos compartilhar informações com parceiros de serviços como sistemas de pagamento e exigências legais.</p>
+                
+                <h5>4. Segurança</h5>
+                <p>Implementamos medidas de segurança para proteger suas informações pessoais contra acesso não autorizado, alteração, divulgação ou destruição.</p>
+                
+                <h5>5. Seus Direitos</h5>
+                <p>Você tem direito de acessar, corrigir ou solicitar a exclusão de seus dados pessoais a qualquer momento, entrando em contato conosco através dos canais de atendimento.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Atualização do resumo da reserva
+        function atualizarResumo() {
+            const checkIn = document.getElementById('check_in');
+            const checkOut = document.getElementById('check_out');
+            const quartoSelect = document.getElementById('quarto');
+            const adultos = document.getElementById('adultos');
+            const criancas = document.getElementById('criancas');
+            
+            const resumoCheckin = document.getElementById('resumo_checkin');
+            const resumoCheckout = document.getElementById('resumo_checkout');
+            const resumoQuarto = document.getElementById('resumo_quarto');
+            const resumoHospedes = document.getElementById('resumo_hospedes');
+            
+            if (checkIn.value) {
+                const dataFormatada = new Date(checkIn.value).toLocaleDateString('pt-BR');
+                resumoCheckin.textContent = dataFormatada;
+            }
+            
+            if (checkOut.value) {
+                const dataFormatada = new Date(checkOut.value).toLocaleDateString('pt-BR');
+                resumoCheckout.textContent = dataFormatada;
+            }
+            
+            if (quartoSelect.selectedIndex > 0) {
+                resumoQuarto.textContent = quartoSelect.options[quartoSelect.selectedIndex].text;
+            }
+            
+            const numAdultos = parseInt(adultos.value);
+            const numCriancas = parseInt(criancas.value);
+            
+            let hospedeTxt = numAdultos + ' ' + (numAdultos === 1 ? 'adulto' : 'adultos');
+            if (numCriancas > 0) {
+                hospedeTxt += ' e ' + numCriancas + ' ' + (numCriancas === 1 ? 'criança' : 'crianças');
+            }
+            resumoHospedes.textContent = hospedeTxt;
+        }
+        
+        // Atualizar resumo quando os campos são alterados
+        document.getElementById('check_in').addEventListener('change', atualizarResumo);
+        document.getElementById('check_out').addEventListener('change', atualizarResumo);
+        document.getElementById('quarto').addEventListener('change', atualizarResumo);
+        document.getElementById('adultos').addEventListener('change', atualizarResumo);
+        document.getElementById('criancas').addEventListener('change', atualizarResumo);
+        
+        // Inicializar resumo
+        atualizarResumo();
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,321 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Quartos e Acomodações - Pousada Pajeu{% endblock %}
+
+{% block content %}
+<!-- Banner da Página -->
+<section class="banner">
+    <img src="{% static 'img/banner-quartos.jpg' %}" alt="Quartos Pousada Pajeu" class="banner-img">
+    <div class="banner-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1>Nossos Quartos</h1>
+                    <p>Conforto e qualidade para sua melhor estadia</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Introdução -->
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="section-title">Acomodações Confortáveis</h2>
+                <p class="lead mb-4">Oferecemos diferentes opções de acomodações para atender às suas necessidades com o máximo de conforto e qualidade.</p>
+                <p>Todos os nossos quartos possuem ar-condicionado, TV, Wi-Fi grátis, frigobar e banheiro privativo com amenidades. O café da manhã está incluso em todas as diárias.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Lista de Quartos -->
+<section class="section bg-light">
+    <div class="container">
+        <!-- Quarto Standard -->
+        <div class="row quarto-item align-items-center mb-5">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="quarto-img">
+                    <img src="{% static 'img/quarto-standard.jpg' %}" alt="Quarto Standard" class="img-fluid">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <span class="badge bg-primary mb-2">A partir de R$ 120,00</span>
+                <h3>Quarto Standard</h3>
+                <p>Quarto confortável ideal para quem busca praticidade sem abrir mão do conforto. Perfeito para viajantes a negócios ou turistas que buscam uma opção econômica de qualidade.</p>
+                
+                <h5 class="mt-4 mb-3">Características:</h5>
+                <ul class="quarto-features">
+                    <li><i class="fas fa-bed"></i> 1 cama de casal ou 2 camas de solteiro</li>
+                    <li><i class="fas fa-user-friends"></i> Acomoda até 2 pessoas</li>
+                    <li><i class="fas fa-ruler-combined"></i> 18m²</li>
+                    <li><i class="fas fa-snowflake"></i> Ar-condicionado</li>
+                    <li><i class="fas fa-tv"></i> TV LED 32"</li>
+                    <li><i class="fas fa-wifi"></i> Wi-Fi gratuito</li>
+                    <li><i class="fas fa-shower"></i> Banheiro privativo com box</li>
+                </ul>
+                
+                <div class="d-flex mt-4">
+                    <a href="{% url 'reservas:nova_reserva' %}?tipo=standard" class="btn btn-primary me-2">Reservar</a>
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalQuartoStandard">
+                        <i class="fas fa-images me-1"></i> Ver mais fotos
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quarto Luxo -->
+        <div class="row quarto-item align-items-center mb-5 flex-lg-row-reverse">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="quarto-img">
+                    <img src="{% static 'img/quarto-luxo.jpg' %}" alt="Quarto Luxo" class="img-fluid">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <span class="badge bg-primary mb-2">A partir de R$ 180,00</span>
+                <h3>Quarto Luxo</h3>
+                <p>Acomodação espaçosa e elegante, proporcionando conforto superior aos nossos hóspedes. Ideal para casais em lua de mel ou viajantes que buscam mais espaço e conforto.</p>
+                
+                <h5 class="mt-4 mb-3">Características:</h5>
+                <ul class="quarto-features">
+                    <li><i class="fas fa-bed"></i> 1 cama king size</li>
+                    <li><i class="fas fa-user-friends"></i> Acomoda até 2 pessoas</li>
+                    <li><i class="fas fa-ruler-combined"></i> 25m²</li>
+                    <li><i class="fas fa-snowflake"></i> Ar-condicionado split</li>
+                    <li><i class="fas fa-tv"></i> Smart TV 43"</li>
+                    <li><i class="fas fa-wifi"></i> Wi-Fi gratuito</li>
+                    <li><i class="fas fa-bath"></i> Banheiro privativo com banheira</li>
+                    <li><i class="fas fa-coffee"></i> Cafeteira</li>
+                </ul>
+                
+                <div class="d-flex mt-4">
+                    <a href="{% url 'reservas:nova_reserva' %}?tipo=luxo" class="btn btn-primary me-2">Reservar</a>
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalQuartoLuxo">
+                        <i class="fas fa-images me-1"></i> Ver mais fotos
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Suíte Família -->
+        <div class="row quarto-item align-items-center mb-5">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="quarto-img">
+                    <img src="{% static 'img/suite-familia.jpg' %}" alt="Suíte Família" class="img-fluid">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <span class="badge bg-primary mb-2">A partir de R$ 250,00</span>
+                <h3>Suíte Família</h3>
+                <p>Ampla suíte projetada especialmente para famílias, oferecendo espaço e conforto para todos. Ambiente aconchegante e funcional para uma estadia perfeita com as crianças.</p>
+                
+                <h5 class="mt-4 mb-3">Características:</h5>
+                <ul class="quarto-features">
+                    <li><i class="fas fa-bed"></i> 1 cama de casal e 2 camas de solteiro</li>
+                    <li><i class="fas fa-user-friends"></i> Acomoda até 4 pessoas</li>
+                    <li><i class="fas fa-ruler-combined"></i> 35m²</li>
+                    <li><i class="fas fa-snowflake"></i> Ar-condicionado split</li>
+                    <li><i class="fas fa-tv"></i> Smart TV 50"</li>
+                    <li><i class="fas fa-wifi"></i> Wi-Fi gratuito</li>
+                    <li><i class="fas fa-shower"></i> Banheiro privativo amplo</li>
+                    <li><i class="fas fa-couch"></i> Área de estar</li>
+                    <li><i class="fas fa-coffee"></i> Cafeteira</li>
+                    <li><i class="fas fa-baby"></i> Berço disponível (sob solicitação)</li>
+                </ul>
+                
+                <div class="d-flex mt-4">
+                    <a href="{% url 'reservas:nova_reserva' %}?tipo=familia" class="btn btn-primary me-2">Reservar</a>
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalSuiteFamilia">
+                        <i class="fas fa-images me-1"></i> Ver mais fotos
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Política do Hotel -->
+<section class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <h3>Horários & Políticas</h3>
+                <div class="mb-4">
+                    <h5><i class="far fa-clock text-primary me-2"></i> Horários</h5>
+                    <ul class="list-unstyled ms-4">
+                        <li><strong>Check-in:</strong> a partir das 14h</li>
+                        <li><strong>Check-out:</strong> até as 12h</li>
+                        <li><strong>Café da manhã:</strong> 06:30h às 10h</li>
+                    </ul>
+                </div>
+                
+                <div class="mb-4">
+                    <h5><i class="fas fa-info-circle text-primary me-2"></i> Políticas</h5>
+                    <ul class="list-unstyled ms-4">
+                        <li>Não é permitido fumar nas acomodações</li>
+                        <li>Animais de estimação não são permitidos</li>
+                        <li>Aceitamos crianças de todas as idades</li>
+                        <li>Todas as crianças menores de 6 anos não pagam</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <h3>Formas de Pagamento</h3>
+                <div class="mb-4">
+                    <p>Aceitamos as seguintes formas de pagamento:</p>
+                    <div class="d-flex flex-wrap gap-3 mb-3">
+                        <i class="fab fa-cc-visa fa-2x"></i>
+                        <i class="fab fa-cc-mastercard fa-2x"></i>
+                        <i class="fab fa-cc-amex fa-2x"></i>
+                        <i class="fab fa-pix fa-2x"></i>
+                        <i class="fas fa-money-bill-wave fa-2x"></i>
+                    </div>
+                    <p>Parcelamento em até 3x sem juros nos cartões de crédito. Para reservas, é necessário um pré-pagamento de 30% do valor total.</p>
+                </div>
+                
+                <div>
+                    <h5><i class="fas fa-tag text-primary me-2"></i> Promoções Especiais</h5>
+                    <p>Temos descontos para:</p>
+                    <ul>
+                        <li>Estadias acima de 7 dias</li>
+                        <li>Grupos e empresas</li>
+                        <li>Pacotes de final de semana</li>
+                    </ul>
+                    <p>Entre em contato conosco para mais informações sobre promoções especiais.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chamada para Ação -->
+<section class="section bg-primary text-white">
+    <div class="container text-center">
+        <h2>Pronto para reservar seu quarto?</h2>
+        <p class="lead mb-4">Reserve diretamente conosco e garanta o melhor preço!</p>
+        <a href="{% url 'reservas:nova_reserva' %}" class="btn btn-warning btn-lg">Fazer Minha Reserva</a>
+    </div>
+</section>
+
+<!-- Modais de Galeria de Fotos -->
+<!-- Modal Quarto Standard -->
+<div class="modal fade" id="modalQuartoStandard" tabindex="-1" aria-labelledby="modalQuartoStandardLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalQuartoStandardLabel">Galeria: Quarto Standard</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="carouselQuartoStandard" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="{% static 'img/quarto-standard.jpg' %}" class="d-block w-100" alt="Quarto Standard">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{% static 'img/quarto-standard-2.jpg' %}" class="d-block w-100" alt="Quarto Standard - Vista 2">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{% static 'img/quarto-standard-3.jpg' %}" class="d-block w-100" alt="Banheiro Quarto Standard">
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselQuartoStandard" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselQuartoStandard" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Próximo</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <a href="{% url 'reservas:nova_reserva' %}?tipo=standard" class="btn btn-primary">Reservar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Quarto Luxo -->
+<div class="modal fade" id="modalQuartoLuxo" tabindex="-1" aria-labelledby="modalQuartoLuxoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalQuartoLuxoLabel">Galeria: Quarto Luxo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="carouselQuartoLuxo" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="{% static 'img/quarto-luxo.jpg' %}" class="d-block w-100" alt="Quarto Luxo">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{% static 'img/quarto-luxo-2.jpg' %}" class="d-block w-100" alt="Quarto Luxo - Vista 2">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{% static 'img/quarto-luxo-3.jpg' %}" class="d-block w-100" alt="Banheiro Quarto Luxo">
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselQuartoLuxo" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselQuartoLuxo" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Próximo</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <a href="{% url 'reservas:nova_reserva' %}?tipo=luxo" class="btn btn-primary">Reservar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Suíte Família -->
+<div class="modal fade" id="modalSuiteFamilia" tabindex="-1" aria-labelledby="modalSuiteFamiliaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalSuiteFamiliaLabel">Galeria: Suíte Família</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="carouselSuiteFamilia" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="{% static 'img/suite-familia.jpg' %}" class="d-block w-100" alt="Suíte Família">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{% static 'img/suite-familia-2.jpg' %}" class="d-block w-100" alt="Suíte Família - Vista 2">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{% static 'img/suite-familia-3.jpg' %}" class="d-block w-100" alt="Banheiro Suíte Família">
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselSuiteFamilia" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselSuiteFamilia" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Próximo</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <a href="{% url 'reservas:nova_reserva' %}?tipo=familia" class="btn btn-primary">Reservar</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

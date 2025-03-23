@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Django
+*.log
+*.pot
+*.pyc
+db.sqlite3
+db.sqlite3-journal
+media
+
+# Ambientes virtuais
+venv/
+ENV/
+
+# Arquivos de ambiente
+.env
+
+# Dados sensíveis
+*.pem
+*.key
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# Outros
+.DS_Store
+.coverage
+htmlcov/ 

@@ -1,0 +1,229 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Reserva Confirmada - Pousada Pajeú{% endblock %}
+
+{% block extra_css %}
+<style>
+    .confirmation-header {
+        background-color: #f8f9fa;
+        padding: 40px 0;
+        text-align: center;
+    }
+    
+    .confirmation-icon {
+        font-size: 5rem;
+        color: #28a745;
+        margin-bottom: 20px;
+    }
+    
+    .confirmation-details {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .detail-section {
+        margin-bottom: 30px;
+    }
+    
+    .detail-section:last-child {
+        margin-bottom: 0;
+    }
+    
+    .detail-title {
+        border-bottom: 2px solid #0d6efd;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        color: #0d6efd;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-label {
+        font-weight: bold;
+    }
+    
+    .reservation-code {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #0d6efd;
+    }
+    
+    .total-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #0d6efd;
+    }
+    
+    .print-button {
+        margin-top: 20px;
+    }
+    
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        
+        body {
+            font-size: 12pt;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho de Confirmação -->
+<section class="confirmation-header">
+    <div class="container">
+        <div class="confirmation-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h1 class="display-4">Reserva Confirmada!</h1>
+        <p class="lead">Sua reserva foi realizada com sucesso. Abaixo estão os detalhes.</p>
+    </div>
+</section>
+
+<!-- Detalhes da Reserva -->
+<section class="py-5">
+    <div class="container">
+        <div class="confirmation-details">
+            <!-- Código da Reserva -->
+            <div class="text-center mb-4">
+                <p>Código da Reserva</p>
+                <h2 class="reservation-code">{{ reserva.codigo }}</h2>
+                <p class="text-muted">Guarde este código para consultas futuras</p>
+            </div>
+            
+            <!-- Informações da Estadia -->
+            <div class="detail-section">
+                <h3 class="detail-title">Informações da Estadia</h3>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Check-in:</span>
+                    <span>{{ reserva.check_in|date:"d/m/Y" }} (a partir das 14h)</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Check-out:</span>
+                    <span>{{ reserva.check_out|date:"d/m/Y" }} (até às 12h)</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Diárias:</span>
+                    {% with diarias=reserva.check_out|timeuntil:reserva.check_in|floatformat:0 %}
+                    <span>{{ diarias|default:"1" }} diária{{ diarias|default:"1"|pluralize }}</span>
+                    {% endwith %}
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Quarto:</span>
+                    <span>{{ reserva.quarto.nome }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Ocupação:</span>
+                    <span>{{ reserva.adultos }} adulto{{ reserva.adultos|pluralize }}, {{ reserva.criancas }} criança{{ reserva.criancas|pluralize }}</span>
+                </div>
+            </div>
+            
+            <!-- Informações do Hóspede -->
+            <div class="detail-section">
+                <h3 class="detail-title">Informações do Hóspede</h3>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Nome:</span>
+                    <span>{{ reserva.hospede.nome }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">E-mail:</span>
+                    <span>{{ reserva.hospede.email }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Telefone:</span>
+                    <span>{{ reserva.hospede.telefone }}</span>
+                </div>
+                
+                {% if reserva.observacoes %}
+                <div class="detail-row">
+                    <span class="detail-label">Observações:</span>
+                    <span>{{ reserva.observacoes }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Valores -->
+            <div class="detail-section">
+                <h3 class="detail-title">Informações de Pagamento</h3>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Valor da diária:</span>
+                    <span>R$ {{ reserva.valor_diaria|floatformat:2 }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Valor total da estadia:</span>
+                    <span class="total-value">R$ {{ reserva.valor_total|floatformat:2 }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Forma de pagamento:</span>
+                    <span>Pagamento na recepção (dinheiro, PIX ou cartão)</span>
+                </div>
+            </div>
+            
+            <!-- Informações Adicionais -->
+            <div class="detail-section">
+                <h3 class="detail-title">Informações Adicionais</h3>
+                
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i> Enviamos um e-mail com os detalhes da sua reserva para {{ reserva.hospede.email }}. Caso não o encontre, verifique sua caixa de spam ou entre em contato conosco.
+                </div>
+                
+                <p><strong>Política de Cancelamento:</strong></p>
+                <ul>
+                    <li>Cancelamento até 7 dias antes do check-in: devolução de 100% do valor</li>
+                    <li>Cancelamento entre 3 e 6 dias antes do check-in: devolução de 50% do valor</li>
+                    <li>Cancelamento com menos de 3 dias antes do check-in: sem devolução</li>
+                </ul>
+                
+                <p><strong>Contato:</strong></p>
+                <p>Em caso de dúvidas ou alterações, entre em contato conosco:</p>
+                <ul>
+                    <li>Telefone: (87) 3831-2020</li>
+                    <li>WhatsApp: (87) 9 9988-7766</li>
+                    <li>E-mail: reservas@pousadapajeu.com.br</li>
+                </ul>
+            </div>
+            
+            <!-- Botões de Ação -->
+            <div class="d-flex justify-content-center mt-4 no-print">
+                <button class="btn btn-primary me-2 print-button" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i> Imprimir Reserva
+                </button>
+                <a href="{% url 'website:home' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-home me-2"></i> Voltar para o Site
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

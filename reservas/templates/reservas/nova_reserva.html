@@ -1,0 +1,470 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Fazer Reserva - Pousada Pajeu{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{% static "img/reserva-banner.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+    }
+    
+    .form-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .section-title {
+        border-bottom: 2px solid #0d6efd;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        color: #0d6efd;
+    }
+    
+    .reservation-summary {
+        background-color: #0d6efd;
+        color: white;
+        border-radius: 8px;
+        padding: 20px;
+    }
+    
+    .summary-title {
+        border-bottom: 2px solid white;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .summary-row:last-child {
+        border-bottom: none;
+    }
+    
+    .total-row {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-top: 20px;
+        padding-top: 10px;
+        border-top: 2px solid white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho da página -->
+<section class="page-header">
+    <div class="container">
+        <h1 class="display-4">Faça sua Reserva</h1>
+        <p class="lead">Preencha o formulário abaixo para reservar sua estadia</p>
+    </div>
+</section>
+
+<!-- Formulário de Reserva -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Datas e Quarto -->
+                    <div class="form-section">
+                        <h3 class="section-title">Datas e Acomodação</h3>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.check_in.id_for_label }}" class="form-label">Data de Check-in</label>
+                                {{ form.check_in }}
+                                {% if form.check_in.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.check_in.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.check_out.id_for_label }}" class="form-label">Data de Check-out</label>
+                                {{ form.check_out }}
+                                {% if form.check_out.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.check_out.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.quarto.id_for_label }}" class="form-label">Tipo de Quarto</label>
+                                {{ form.quarto }}
+                                {% if form.quarto.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.quarto.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.adultos.id_for_label }}" class="form-label">Número de Adultos</label>
+                                {{ form.adultos }}
+                                {% if form.adultos.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.adultos.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.criancas.id_for_label }}" class="form-label">Número de Crianças</label>
+                                {{ form.criancas }}
+                                {% if form.criancas.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.criancas.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="button" id="verificar-disponibilidade" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i> Verificar Disponibilidade
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Informações do Hóspede -->
+                    <div class="form-section">
+                        <h3 class="section-title">Informações Pessoais</h3>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.nome.id_for_label }}" class="form-label">Nome Completo</label>
+                                {{ form.nome }}
+                                {% if form.nome.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.nome.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.cpf.id_for_label }}" class="form-label">CPF</label>
+                                {{ form.cpf }}
+                                {% if form.cpf.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.cpf.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.telefone.id_for_label }}" class="form-label">Telefone</label>
+                                {{ form.telefone }}
+                                {% if form.telefone.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.telefone.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">E-mail</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.email.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Solicitações Especiais -->
+                    <div class="form-section">
+                        <h3 class="section-title">Solicitações Especiais</h3>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="{{ form.observacoes.id_for_label }}" class="form-label">Observações ou Solicitações Especiais</label>
+                                {{ form.observacoes }}
+                                {% if form.observacoes.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.observacoes.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Termos e Condições -->
+                    <div class="form-section">
+                        <h3 class="section-title">Termos e Condições</h3>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" value="" id="termos" required>
+                            <label class="form-check-label" for="termos">
+                                Li e aceito os <a href="#" data-bs-toggle="modal" data-bs-target="#termosModal">termos e condições</a>
+                            </label>
+                            <div class="invalid-feedback">
+                                Você deve aceitar os termos e condições para prosseguir.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-check-circle me-2"></i> Confirmar Reserva
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Resumo da Reserva -->
+                <div class="reservation-summary" id="resumo_reserva">
+                    <h3 class="summary-title">Resumo da Reserva</h3>
+                    
+                    <div class="summary-row">
+                        <span>Check-in:</span>
+                        <span id="resumo_checkin">--/--/----</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Check-out:</span>
+                        <span id="resumo_checkout">--/--/----</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Quarto:</span>
+                        <span id="resumo_quarto">---</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Hóspedes:</span>
+                        <span id="resumo_hospedes">- adultos, - crianças</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Diárias:</span>
+                        <span id="resumo_diarias">--</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Valor da diária:</span>
+                        <span id="valor_diaria">R$ 0,00</span>
+                    </div>
+                    
+                    <div class="total-row">
+                        <span>Valor Total:</span>
+                        <span id="preco_total">R$ 0,00</span>
+                    </div>
+                </div>
+                
+                <!-- Informações Adicionais -->
+                <div class="mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-info-circle me-2"></i> Informações</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-clock me-2 text-primary"></i> Check-in: a partir das 14h</li>
+                                <li><i class="fas fa-clock me-2 text-primary"></i> Check-out: até às 12h</li>
+                                <li><i class="fas fa-utensils me-2 text-primary"></i> Café da manhã incluso</li>
+                                <li><i class="fas fa-wifi me-2 text-primary"></i> Wi-Fi gratuito</li>
+                                <li><i class="fas fa-car me-2 text-primary"></i> Estacionamento gratuito</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ajuda -->
+                <div class="mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-question-circle me-2"></i> Precisa de ajuda?</h5>
+                            <p>Entre em contato com nossa central de reservas:</p>
+                            <p><i class="fas fa-phone me-2"></i> (87) 3831-2020</p>
+                            <p><i class="fab fa-whatsapp me-2"></i> (87) 9 9988-7766</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal de Termos e Condições -->
+<div class="modal fade" id="termosModal" tabindex="-1" aria-labelledby="termosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termosModalLabel">Termos e Condições de Reserva</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Políticas de Reserva</h6>
+                <p>A reserva só é confirmada após o recebimento do e-mail de confirmação da Pousada Pajeu. Reservas não confirmadas em até 24 horas podem ser canceladas automaticamente.</p>
+                
+                <h6>Check-in e Check-out</h6>
+                <p>O horário de check-in é a partir das 14h e o check-out até às 12h. Early check-in e late check-out estão sujeitos a disponibilidade e podem ter custos adicionais.</p>
+                
+                <h6>Formas de Pagamento</h6>
+                <p>Aceitamos pagamento em dinheiro, cartões de crédito (Visa, Mastercard, American Express) e débito, além de PIX. O pagamento é realizado no momento do check-in.</p>
+                
+                <h6>Política de Cancelamento</h6>
+                <p>Cancelamentos com até 7 dias de antecedência têm 100% de reembolso. Cancelamentos entre 3 e 6 dias antes do check-in têm 50% de reembolso. Cancelamentos com menos de 3 dias de antecedência não têm reembolso.</p>
+                
+                <h6>Regras Gerais</h6>
+                <p>É proibido fumar nas áreas internas da pousada. Animais de estimação de pequeno porte são permitidos mediante consulta prévia. O hóspede é responsável por quaisquer danos causados à propriedade.</p>
+                
+                <h6>Política de Privacidade</h6>
+                <p>Os dados pessoais fornecidos serão utilizados apenas para fins de reserva e não serão compartilhados com terceiros, exceto quando exigido por lei.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendi e Aceito</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elementos do formulário
+        const checkInInput = document.getElementById('{{ form.check_in.id_for_label }}');
+        const checkOutInput = document.getElementById('{{ form.check_out.id_for_label }}');
+        const quartoSelect = document.getElementById('{{ form.quarto.id_for_label }}');
+        const adultosSelect = document.getElementById('{{ form.adultos.id_for_label }}');
+        const criancasSelect = document.getElementById('{{ form.criancas.id_for_label }}');
+        
+        // Elementos do resumo
+        const resumoCheckin = document.getElementById('resumo_checkin');
+        const resumoCheckout = document.getElementById('resumo_checkout');
+        const resumoQuarto = document.getElementById('resumo_quarto');
+        const resumoHospedes = document.getElementById('resumo_hospedes');
+        const resumoDiarias = document.getElementById('resumo_diarias');
+        const valorDiaria = document.getElementById('valor_diaria');
+        const precoTotal = document.getElementById('preco_total');
+        
+        // Formatar data para exibição
+        function formatarData(dataString) {
+            if (!dataString) return '--/--/----';
+            const data = new Date(dataString);
+            return data.toLocaleDateString('pt-BR');
+        }
+        
+        // Calcular número de diárias
+        function calcularDiarias(checkIn, checkOut) {
+            if (!checkIn || !checkOut) return 0;
+            const dataIn = new Date(checkIn);
+            const dataOut = new Date(checkOut);
+            const diffTime = Math.abs(dataOut - dataIn);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+        
+        // Atualizar resumo da reserva
+        function atualizarResumo() {
+            const checkIn = checkInInput.value;
+            const checkOut = checkOutInput.value;
+            const quartoOption = quartoSelect.options[quartoSelect.selectedIndex];
+            const quarto = quartoOption ? quartoOption.text : '---';
+            const adultos = adultosSelect.value;
+            const criancas = criancasSelect.value;
+            
+            resumoCheckin.textContent = formatarData(checkIn);
+            resumoCheckout.textContent = formatarData(checkOut);
+            resumoQuarto.textContent = quarto;
+            resumoHospedes.textContent = `${adultos} adulto(s), ${criancas} criança(s)`;
+            
+            const diarias = calcularDiarias(checkIn, checkOut);
+            resumoDiarias.textContent = diarias > 0 ? `${diarias} diária(s)` : '--';
+            
+            // Simulando um valor diário baseado no tipo de quarto
+            let valorDiario = 0;
+            if (quartoOption) {
+                if (quarto.includes('Standard')) {
+                    valorDiario = 120;
+                } else if (quarto.includes('Luxo')) {
+                    valorDiario = 180;
+                } else if (quarto.includes('Família')) {
+                    valorDiario = 250;
+                }
+            }
+            
+            valorDiaria.textContent = `R$ ${valorDiario.toFixed(2)}`;
+            
+            const total = valorDiario * diarias;
+            precoTotal.textContent = `R$ ${total.toFixed(2)}`;
+        }
+        
+        // Adicionar event listeners
+        checkInInput.addEventListener('change', atualizarResumo);
+        checkOutInput.addEventListener('change', atualizarResumo);
+        quartoSelect.addEventListener('change', atualizarResumo);
+        adultosSelect.addEventListener('change', atualizarResumo);
+        criancasSelect.addEventListener('change', atualizarResumo);
+        
+        // Verificar disponibilidade
+        document.getElementById('verificar-disponibilidade').addEventListener('click', function() {
+            const checkIn = checkInInput.value;
+            const checkOut = checkOutInput.value;
+            
+            if (!checkIn || !checkOut) {
+                alert('Por favor, selecione as datas de check-in e check-out.');
+                return;
+            }
+            
+            // Simular verificação de disponibilidade
+            setTimeout(function() {
+                alert('Quarto disponível para o período selecionado! Preencha o restante do formulário para concluir sua reserva.');
+                atualizarResumo();
+            }, 1000);
+        });
+        
+        // Validação do formulário
+        const form = document.querySelector('form.needs-validation');
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            // Verificar se os termos foram aceitos
+            const termosCheckbox = document.getElementById('termos');
+            if (!termosCheckbox.checked) {
+                event.preventDefault();
+                alert('Você precisa aceitar os termos e condições para continuar.');
+            }
+            
+            form.classList.add('was-validated');
+        });
+        
+        // Inicializar resumo
+        atualizarResumo();
+    });
+</script>
+{% endblock %} 

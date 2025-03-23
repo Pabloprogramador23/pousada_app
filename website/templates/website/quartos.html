@@ -1,0 +1,208 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Quartos e Acomodações - Pousada Pajeú{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{% static "img/quartos-banner.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+    }
+    
+    .room-card {
+        margin-bottom: 30px;
+        transition: transform 0.3s ease;
+    }
+    
+    .room-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .room-feature {
+        margin-right: 15px;
+        color: #6c757d;
+    }
+    
+    .price-label {
+        background-color: #0d6efd;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho da página -->
+<section class="page-header">
+    <div class="container">
+        <h1 class="display-4">Nossos Quartos</h1>
+        <p class="lead">Conforto e qualidade para sua melhor estadia</p>
+    </div>
+</section>
+
+<!-- Introdução -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 mx-auto text-center">
+                <h2>Acomodações Confortáveis</h2>
+                <p class="lead">Escolha o quarto ideal para sua estadia</p>
+                <p>A Pousada Pajeú oferece diferentes tipos de acomodações para atender às necessidades dos nossos hóspedes. 
+                Todos os quartos contam com ar-condicionado, TV, Wi-Fi gratuito e banheiro privativo. 
+                Conheça nossas opções e escolha a que melhor se adapta à sua necessidade.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Lista de Quartos -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <!-- Quarto Standard -->
+        <div class="card room-card mb-4">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="{% static 'img/quarto-standard.jpg' %}" class="img-fluid rounded-start h-100" alt="Quarto Standard">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h3 class="card-title">Quarto Standard</h3>
+                            <span class="price-label">A partir de R$ 120,00</span>
+                        </div>
+                        <p class="card-text">Nosso quarto Standard oferece o conforto essencial para uma estadia agradável. 
+                        Ideal para viajantes individuais ou casais que buscam praticidade sem abrir mão da qualidade.</p>
+                        
+                        <h5 class="mt-3">Características</h5>
+                        <div class="d-flex flex-wrap mb-3">
+                            <span class="room-feature"><i class="fas fa-user-friends"></i> 2 pessoas</span>
+                            <span class="room-feature"><i class="fas fa-bed"></i> 1 cama de casal</span>
+                            <span class="room-feature"><i class="fas fa-wifi"></i> Wi-Fi</span>
+                            <span class="room-feature"><i class="fas fa-tv"></i> TV</span>
+                            <span class="room-feature"><i class="fas fa-snowflake"></i> Ar-condicionado</span>
+                            <span class="room-feature"><i class="fas fa-bath"></i> Banheiro privativo</span>
+                        </div>
+                        
+                        <a href="{% url 'reservas:criar' %}" class="btn btn-primary">Reservar Agora</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quarto Luxo -->
+        <div class="card room-card mb-4">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="{% static 'img/quarto-luxo.jpg' %}" class="img-fluid rounded-start h-100" alt="Quarto Luxo">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h3 class="card-title">Quarto Luxo</h3>
+                            <span class="price-label">A partir de R$ 180,00</span>
+                        </div>
+                        <p class="card-text">Nosso quarto Luxo oferece mais espaço e conforto, com uma bela vista para a cidade. 
+                        Perfeito para quem busca um pouco mais de sofisticação e conforto durante a estadia.</p>
+                        
+                        <h5 class="mt-3">Características</h5>
+                        <div class="d-flex flex-wrap mb-3">
+                            <span class="room-feature"><i class="fas fa-user-friends"></i> 2 pessoas</span>
+                            <span class="room-feature"><i class="fas fa-bed"></i> 1 cama queen size</span>
+                            <span class="room-feature"><i class="fas fa-wifi"></i> Wi-Fi</span>
+                            <span class="room-feature"><i class="fas fa-tv"></i> TV 40"</span>
+                            <span class="room-feature"><i class="fas fa-snowflake"></i> Ar-condicionado</span>
+                            <span class="room-feature"><i class="fas fa-bath"></i> Banheiro com box</span>
+                            <span class="room-feature"><i class="fas fa-coffee"></i> Cafeteira</span>
+                            <span class="room-feature"><i class="fas fa-window-maximize"></i> Vista para cidade</span>
+                        </div>
+                        
+                        <a href="{% url 'reservas:criar' %}" class="btn btn-primary">Reservar Agora</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Suíte Família -->
+        <div class="card room-card mb-4">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="{% static 'img/suite-familia.jpg' %}" class="img-fluid rounded-start h-100" alt="Suíte Família">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h3 class="card-title">Suíte Família</h3>
+                            <span class="price-label">A partir de R$ 250,00</span>
+                        </div>
+                        <p class="card-text">Nossa Suíte Família é a escolha perfeita para famílias ou grupos. 
+                        Com amplo espaço, acomoda confortavelmente até 5 pessoas e oferece toda a comodidade 
+                        para uma estadia inesquecível.</p>
+                        
+                        <h5 class="mt-3">Características</h5>
+                        <div class="d-flex flex-wrap mb-3">
+                            <span class="room-feature"><i class="fas fa-users"></i> Até 5 pessoas</span>
+                            <span class="room-feature"><i class="fas fa-bed"></i> 1 cama de casal + 3 solteiro</span>
+                            <span class="room-feature"><i class="fas fa-wifi"></i> Wi-Fi</span>
+                            <span class="room-feature"><i class="fas fa-tv"></i> Smart TV 50"</span>
+                            <span class="room-feature"><i class="fas fa-snowflake"></i> Ar-condicionado</span>
+                            <span class="room-feature"><i class="fas fa-bath"></i> Banheiro amplo</span>
+                            <span class="room-feature"><i class="fas fa-coffee"></i> Cafeteira</span>
+                            <span class="room-feature"><i class="fas fa-couch"></i> Área de estar</span>
+                            <span class="room-feature"><i class="fas fa-refrigerator"></i> Frigobar</span>
+                        </div>
+                        
+                        <a href="{% url 'reservas:criar' %}" class="btn btn-primary">Reservar Agora</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Informações Adicionais -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Informações Importantes</h3>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><i class="fas fa-clock text-primary me-2"></i> Check-in: a partir das 14h</li>
+                    <li class="list-group-item"><i class="fas fa-clock text-primary me-2"></i> Check-out: até às 12h</li>
+                    <li class="list-group-item"><i class="fas fa-utensils text-primary me-2"></i> Café da manhã incluso</li>
+                    <li class="list-group-item"><i class="fas fa-child text-primary me-2"></i> Crianças até 5 anos não pagam</li>
+                    <li class="list-group-item"><i class="fas fa-paw text-primary me-2"></i> Aceitamos animais de pequeno porte (consulte condições)</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h3>Política de Cancelamento</h3>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Cancelamento com até 7 dias de antecedência: devolução de 100% do valor</li>
+                    <li class="list-group-item">Cancelamento com 3 a 6 dias de antecedência: devolução de 50% do valor</li>
+                    <li class="list-group-item">Cancelamento com menos de 3 dias: sem devolução de valores</li>
+                    <li class="list-group-item">Alterações de data estão sujeitas a disponibilidade</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2>Está pronto para garantir sua reserva?</h2>
+        <p class="lead">Aproveite nossos preços especiais para reservas antecipadas</p>
+        <a href="{% url 'reservas:criar' %}" class="btn btn-light btn-lg">Reservar Agora</a>
+    </div>
+</section>
+{% endblock %} 
