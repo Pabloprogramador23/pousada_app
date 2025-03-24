@@ -71,7 +71,7 @@
 <section class="page-header">
     <div class="container">
         <h1 class="display-4">Faça sua Reserva</h1>
-        <p class="lead">Preencha o formulário abaixo para reservar sua estadia</p>
+        <p class="lead">Preencha o formulário abaixo para reservar sua estadia próxima às melhores feiras de moda de Fortaleza</p>
     </div>
 </section>
 
@@ -214,6 +214,9 @@
                                     {{ form.observacoes.errors }}
                                 </div>
                                 {% endif %}
+                                <div class="form-text mt-2">
+                                    Se você precisa de despertador para as feiras da madrugada, café da manhã em horário especial ou tem outras necessidades relacionadas às feiras de moda, por favor, informe aqui.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -258,7 +261,7 @@
                     
                     <div class="summary-row">
                         <span>Quarto:</span>
-                        <span id="resumo_quarto">---</span>
+                        <span id="resumo_quarto">-----</span>
                     </div>
                     
                     <div class="summary-row">
@@ -267,46 +270,47 @@
                     </div>
                     
                     <div class="summary-row">
-                        <span>Diárias:</span>
-                        <span id="resumo_diarias">--</span>
+                        <span>Noites:</span>
+                        <span id="resumo_noites">-</span>
                     </div>
                     
                     <div class="summary-row">
-                        <span>Valor da diária:</span>
-                        <span id="valor_diaria">R$ 0,00</span>
+                        <span>Diária:</span>
+                        <span id="resumo_diaria">R$ ---,--</span>
                     </div>
                     
-                    <div class="total-row">
-                        <span>Valor Total:</span>
-                        <span id="preco_total">R$ 0,00</span>
+                    <div class="summary-row total-row">
+                        <span>Total:</span>
+                        <span id="resumo_total">R$ ---,--</span>
                     </div>
                 </div>
                 
-                <!-- Informações Adicionais -->
-                <div class="mt-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-info-circle me-2"></i> Informações</h5>
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-clock me-2 text-primary"></i> Check-in: a partir das 14h</li>
-                                <li><i class="fas fa-clock me-2 text-primary"></i> Check-out: até às 12h</li>
-                                <li><i class="fas fa-utensils me-2 text-primary"></i> Café da manhã incluso</li>
-                                <li><i class="fas fa-wifi me-2 text-primary"></i> Wi-Fi gratuito</li>
-                                <li><i class="fas fa-car me-2 text-primary"></i> Estacionamento gratuito</li>
-                            </ul>
-                        </div>
+                <!-- Benefícios da Pousada -->
+                <div class="card mt-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Benefícios da Pousada Pajeu</h5>
                     </div>
-                </div>
-                
-                <!-- Ajuda -->
-                <div class="mt-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-question-circle me-2"></i> Precisa de ajuda?</h5>
-                            <p>Entre em contato com nossa central de reservas:</p>
-                            <p><i class="fas fa-phone me-2"></i> (87) 3831-2020</p>
-                            <p><i class="fab fa-whatsapp me-2"></i> (87) 9 9988-7766</p>
-                        </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <i class="fas fa-map-marker-alt text-primary me-2"></i> Localização ao lado da Feira José Avelino
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-street-view text-primary me-2"></i> 5 minutos do Feirão Buraco da Gia
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-coffee text-primary me-2"></i> Café da manhã incluso (horários flexíveis)
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-wifi text-primary me-2"></i> Wi-Fi gratuito em toda a pousada
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-parking text-primary me-2"></i> Estacionamento seguro para hóspedes
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-info-circle text-primary me-2"></i> Informações e dicas sobre as feiras
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -314,7 +318,7 @@
     </div>
 </section>
 
-<!-- Modal de Termos e Condições -->
+<!-- Modal Termos e Condições -->
 <div class="modal fade" id="termosModal" tabindex="-1" aria-labelledby="termosModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -323,148 +327,212 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <h6>Políticas de Reserva</h6>
-                <p>A reserva só é confirmada após o recebimento do e-mail de confirmação da Pousada Pajeu. Reservas não confirmadas em até 24 horas podem ser canceladas automaticamente.</p>
+                <h5>1. Reservas</h5>
+                <p>A confirmação da reserva está sujeita à disponibilidade de acomodações e será efetivada mediante o pagamento de 30% do valor total da estadia.</p>
                 
-                <h6>Check-in e Check-out</h6>
-                <p>O horário de check-in é a partir das 14h e o check-out até às 12h. Early check-in e late check-out estão sujeitos a disponibilidade e podem ter custos adicionais.</p>
+                <h5>2. Política de Check-in e Check-out</h5>
+                <p>O check-in está disponível a partir das 14h e o check-out deve ser realizado até as 12h. Para hóspedes que precisam sair muito cedo para as feiras da madrugada, oferecemos serviço de despertador e café da manhã em horário especial mediante solicitação prévia.</p>
                 
-                <h6>Formas de Pagamento</h6>
-                <p>Aceitamos pagamento em dinheiro, cartões de crédito (Visa, Mastercard, American Express) e débito, além de PIX. O pagamento é realizado no momento do check-in.</p>
+                <h5>3. Pagamento</h5>
+                <p>Aceitamos pagamentos em dinheiro, cartões de crédito (parcelamento em até 3x sem juros), cartões de débito e PIX. O valor remanescente da reserva deverá ser pago no momento do check-in.</p>
                 
-                <h6>Política de Cancelamento</h6>
-                <p>Cancelamentos com até 7 dias de antecedência têm 100% de reembolso. Cancelamentos entre 3 e 6 dias antes do check-in têm 50% de reembolso. Cancelamentos com menos de 3 dias de antecedência não têm reembolso.</p>
+                <h5>4. Política de Cancelamento</h5>
+                <ul>
+                    <li>Cancelamentos realizados com mais de 7 dias de antecedência da data de check-in: reembolso de 100% do valor pago.</li>
+                    <li>Cancelamentos realizados entre 3 e 7 dias de antecedência: reembolso de 50% do valor pago.</li>
+                    <li>Cancelamentos com menos de 3 dias de antecedência ou no-show: não haverá reembolso.</li>
+                </ul>
                 
-                <h6>Regras Gerais</h6>
-                <p>É proibido fumar nas áreas internas da pousada. Animais de estimação de pequeno porte são permitidos mediante consulta prévia. O hóspede é responsável por quaisquer danos causados à propriedade.</p>
+                <h5>5. Política para Crianças</h5>
+                <p>Crianças até 6 anos, hospedadas no mesmo quarto dos pais, não pagam. Acima de 6 anos, será cobrada a tarifa normal.</p>
                 
-                <h6>Política de Privacidade</h6>
-                <p>Os dados pessoais fornecidos serão utilizados apenas para fins de reserva e não serão compartilhados com terceiros, exceto quando exigido por lei.</p>
+                <h5>6. Regras Gerais</h5>
+                <ul>
+                    <li>Não é permitido fumar nas dependências internas da pousada.</li>
+                    <li>Não aceitamos animais de estimação.</li>
+                    <li>É proibido o uso das acomodações por pessoas não registradas.</li>
+                    <li>Pedimos silêncio nos corredores após as 22h.</li>
+                </ul>
+                
+                <h5>7. Responsabilidade</h5>
+                <p>A Pousada Pajeu não se responsabiliza por objetos de valor deixados nas acomodações ou áreas comuns. Cofres estão disponíveis na recepção para guarda de valores.</p>
+                
+                <p class="mt-4">Ao efetuar uma reserva, o hóspede declara estar ciente e de acordo com os termos e condições aqui estabelecidos.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendi e Aceito</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="document.getElementById('termos').checked = true;">Aceito os Termos</button>
             </div>
         </div>
     </div>
 </div>
 
-{% endblock %}
-
-{% block extra_js %}
+<!-- Scripts -->
+{% block extra_scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Elementos do formulário
-        const checkInInput = document.getElementById('{{ form.check_in.id_for_label }}');
-        const checkOutInput = document.getElementById('{{ form.check_out.id_for_label }}');
-        const quartoSelect = document.getElementById('{{ form.quarto.id_for_label }}');
-        const adultosSelect = document.getElementById('{{ form.adultos.id_for_label }}');
-        const criancasSelect = document.getElementById('{{ form.criancas.id_for_label }}');
+        // Máscaras para inputs
+        const telefoneInput = document.querySelector('.telefone-mask');
+        if(telefoneInput) {
+            telefoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 11) value = value.slice(0, 11);
+                
+                if (value.length > 6) {
+                    value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+                } else if (value.length > 2) {
+                    value = value.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+                } else if (value.length > 0) {
+                    value = value.replace(/^(\d{0,2})/, '($1');
+                }
+                
+                e.target.value = value;
+            });
+        }
         
-        // Elementos do resumo
-        const resumoCheckin = document.getElementById('resumo_checkin');
-        const resumoCheckout = document.getElementById('resumo_checkout');
-        const resumoQuarto = document.getElementById('resumo_quarto');
-        const resumoHospedes = document.getElementById('resumo_hospedes');
-        const resumoDiarias = document.getElementById('resumo_diarias');
-        const valorDiaria = document.getElementById('valor_diaria');
-        const precoTotal = document.getElementById('preco_total');
+        const cpfInput = document.querySelector('#id_cpf');
+        if(cpfInput) {
+            cpfInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 11) value = value.slice(0, 11);
+                
+                if (value.length > 9) {
+                    value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2}).*/, '$1.$2.$3-$4');
+                } else if (value.length > 6) {
+                    value = value.replace(/^(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+                } else if (value.length > 3) {
+                    value = value.replace(/^(\d{3})(\d{0,3})/, '$1.$2');
+                }
+                
+                e.target.value = value;
+            });
+        }
         
-        // Formatar data para exibição
+        // Atualizar resumo da reserva
+        const checkinInput = document.querySelector('#id_check_in');
+        const checkoutInput = document.querySelector('#id_check_out');
+        const quartoSelect = document.querySelector('#id_quarto');
+        const adultosSelect = document.querySelector('#id_adultos');
+        const criancasSelect = document.querySelector('#id_criancas');
+        
+        function atualizarResumo() {
+            // Checkin
+            if(checkinInput.value) {
+                document.querySelector('#resumo_checkin').textContent = formatarData(checkinInput.value);
+            }
+            
+            // Checkout
+            if(checkoutInput.value) {
+                document.querySelector('#resumo_checkout').textContent = formatarData(checkoutInput.value);
+            }
+            
+            // Calcular noites
+            if(checkinInput.value && checkoutInput.value) {
+                const checkin = new Date(checkinInput.value);
+                const checkout = new Date(checkoutInput.value);
+                const diffTime = Math.abs(checkout - checkin);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if(diffDays > 0) {
+                    document.querySelector('#resumo_noites').textContent = diffDays;
+                }
+            }
+            
+            // Quarto
+            if(quartoSelect.selectedIndex > 0) {
+                const quartoOption = quartoSelect.options[quartoSelect.selectedIndex];
+                document.querySelector('#resumo_quarto').textContent = quartoOption.text;
+                
+                // Simular valor da diária
+                const diarias = {
+                    'standard': 120,
+                    'luxo': 180,
+                    'familia': 250
+                };
+                
+                let quartoTipo = quartoOption.value;
+                // Na vida real, esse valor viria do backend
+                let valorDiaria = 150; // Valor padrão
+                
+                // Simulação
+                if(quartoTipo.includes('standard')) valorDiaria = diarias.standard;
+                else if(quartoTipo.includes('luxo')) valorDiaria = diarias.luxo;
+                else if(quartoTipo.includes('familia')) valorDiaria = diarias.familia;
+                
+                document.querySelector('#resumo_diaria').textContent = `R$ ${valorDiaria.toFixed(2).replace('.', ',')}`;
+                
+                // Calcular total
+                const noites = parseInt(document.querySelector('#resumo_noites').textContent);
+                if(!isNaN(noites) && noites > 0) {
+                    const valorTotal = valorDiaria * noites;
+                    document.querySelector('#resumo_total').textContent = `R$ ${valorTotal.toFixed(2).replace('.', ',')}`;
+                }
+            }
+            
+            // Hóspedes
+            if(adultosSelect.value && criancasSelect.value) {
+                const adultos = adultosSelect.value;
+                const criancas = criancasSelect.value;
+                document.querySelector('#resumo_hospedes').textContent = `${adultos} adulto${adultos > 1 ? 's' : ''}, ${criancas} criança${criancas != 1 ? 's' : ''}`;
+            }
+        }
+        
         function formatarData(dataString) {
-            if (!dataString) return '--/--/----';
             const data = new Date(dataString);
             return data.toLocaleDateString('pt-BR');
         }
         
-        // Calcular número de diárias
-        function calcularDiarias(checkIn, checkOut) {
-            if (!checkIn || !checkOut) return 0;
-            const dataIn = new Date(checkIn);
-            const dataOut = new Date(checkOut);
-            const diffTime = Math.abs(dataOut - dataIn);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays;
-        }
-        
-        // Atualizar resumo da reserva
-        function atualizarResumo() {
-            const checkIn = checkInInput.value;
-            const checkOut = checkOutInput.value;
-            const quartoOption = quartoSelect.options[quartoSelect.selectedIndex];
-            const quarto = quartoOption ? quartoOption.text : '---';
-            const adultos = adultosSelect.value;
-            const criancas = criancasSelect.value;
-            
-            resumoCheckin.textContent = formatarData(checkIn);
-            resumoCheckout.textContent = formatarData(checkOut);
-            resumoQuarto.textContent = quarto;
-            resumoHospedes.textContent = `${adultos} adulto(s), ${criancas} criança(s)`;
-            
-            const diarias = calcularDiarias(checkIn, checkOut);
-            resumoDiarias.textContent = diarias > 0 ? `${diarias} diária(s)` : '--';
-            
-            // Simulando um valor diário baseado no tipo de quarto
-            let valorDiario = 0;
-            if (quartoOption) {
-                if (quarto.includes('Standard')) {
-                    valorDiario = 120;
-                } else if (quarto.includes('Luxo')) {
-                    valorDiario = 180;
-                } else if (quarto.includes('Família')) {
-                    valorDiario = 250;
-                }
-            }
-            
-            valorDiaria.textContent = `R$ ${valorDiario.toFixed(2)}`;
-            
-            const total = valorDiario * diarias;
-            precoTotal.textContent = `R$ ${total.toFixed(2)}`;
-        }
-        
         // Adicionar event listeners
-        checkInInput.addEventListener('change', atualizarResumo);
-        checkOutInput.addEventListener('change', atualizarResumo);
-        quartoSelect.addEventListener('change', atualizarResumo);
-        adultosSelect.addEventListener('change', atualizarResumo);
-        criancasSelect.addEventListener('change', atualizarResumo);
+        if(checkinInput) checkinInput.addEventListener('change', atualizarResumo);
+        if(checkoutInput) checkoutInput.addEventListener('change', atualizarResumo);
+        if(quartoSelect) quartoSelect.addEventListener('change', atualizarResumo);
+        if(adultosSelect) adultosSelect.addEventListener('change', atualizarResumo);
+        if(criancasSelect) criancasSelect.addEventListener('change', atualizarResumo);
         
-        // Verificar disponibilidade
-        document.getElementById('verificar-disponibilidade').addEventListener('click', function() {
-            const checkIn = checkInInput.value;
-            const checkOut = checkOutInput.value;
-            
-            if (!checkIn || !checkOut) {
-                alert('Por favor, selecione as datas de check-in e check-out.');
-                return;
-            }
-            
-            // Simular verificação de disponibilidade
-            setTimeout(function() {
-                alert('Quarto disponível para o período selecionado! Preencha o restante do formulário para concluir sua reserva.');
-                atualizarResumo();
-            }, 1000);
-        });
+        // Botão Verificar Disponibilidade
+        const btnVerificarDisponibilidade = document.querySelector('#verificar-disponibilidade');
+        if(btnVerificarDisponibilidade) {
+            btnVerificarDisponibilidade.addEventListener('click', function() {
+                // Simulação de verificação de disponibilidade
+                const checkin = checkinInput.value;
+                const checkout = checkoutInput.value;
+                const quarto = quartoSelect.value;
+                
+                if(!checkin || !checkout || !quarto) {
+                    alert('Por favor, preencha as datas de check-in e check-out e selecione um quarto.');
+                    return;
+                }
+                
+                // Exibir loading
+                btnVerificarDisponibilidade.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verificando...';
+                btnVerificarDisponibilidade.disabled = true;
+                
+                // Simular chamada de API
+                setTimeout(function() {
+                    btnVerificarDisponibilidade.innerHTML = '<i class="fas fa-check-circle me-2"></i> Disponível! Preencha seus dados para continuar';
+                    btnVerificarDisponibilidade.classList.remove('btn-primary');
+                    btnVerificarDisponibilidade.classList.add('btn-success');
+                    btnVerificarDisponibilidade.disabled = true;
+                    
+                    // Atualizar resumo
+                    atualizarResumo();
+                }, 1500);
+            });
+        }
         
-        // Validação do formulário
-        const form = document.querySelector('form.needs-validation');
-        form.addEventListener('submit', function(event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            
-            // Verificar se os termos foram aceitos
-            const termosCheckbox = document.getElementById('termos');
-            if (!termosCheckbox.checked) {
-                event.preventDefault();
-                alert('Você precisa aceitar os termos e condições para continuar.');
-            }
-            
-            form.classList.add('was-validated');
-        });
-        
-        // Inicializar resumo
-        atualizarResumo();
+        // Formulário
+        const form = document.querySelector('form');
+        if(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        }
     });
 </script>
+{% endblock %}
 {% endblock %} 

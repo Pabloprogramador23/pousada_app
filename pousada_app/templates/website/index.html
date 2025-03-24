@@ -1,7 +1,7 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
-{% block title %}Pousada Pajeu - Sua melhor estadia em Serra Talhada{% endblock %}
+{% block title %}Pousada Pajeu - Sua melhor estadia em Fortaleza{% endblock %}
 
 {% block content %}
 <!-- Banner Principal -->
@@ -12,7 +12,7 @@
             <div class="row">
                 <div class="col-lg-8">
                     <h1>Bem-vindo à Pousada Pajeu</h1>
-                    <p>Conforto, tranquilidade e excelente localização em Serra Talhada, Pernambuco.</p>
+                    <p>Conforto, ambiente familiar e localização privilegiada próxima às principais feiras de moda em Fortaleza.</p>
                     <a href="{% url 'reservas:criar' %}" class="btn btn-warning btn-lg">Reservar Agora</a>
                 </div>
             </div>
@@ -81,8 +81,8 @@
                 <div class="feature-icon">
                     <i class="fas fa-wifi"></i>
                 </div>
-                <h4>Wi-Fi Gratuito</h4>
-                <p>Internet de alta velocidade disponível em todas as áreas da pousada.</p>
+                <h4>Wi-Fi na Recepção</h4>
+                <p>Internet disponível gratuitamente na área da recepção da pousada.</p>
             </div>
             
             <div class="col-md-4 mb-4">
@@ -103,14 +103,6 @@
             
             <div class="col-md-4 mb-4">
                 <div class="feature-icon">
-                    <i class="fas fa-swimming-pool"></i>
-                </div>
-                <h4>Piscina</h4>
-                <p>Piscina refrescante para relaxar depois de um dia de passeios.</p>
-            </div>
-            
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon">
                     <i class="fas fa-concierge-bell"></i>
                 </div>
                 <h4>Recepção 24h</h4>
@@ -119,10 +111,18 @@
             
             <div class="col-md-4 mb-4">
                 <div class="feature-icon">
-                    <i class="fas fa-utensils"></i>
+                    <i class="fas fa-shopping-bag"></i>
                 </div>
-                <h4>Restaurante</h4>
-                <p>Restaurante com pratos regionais e internacionais.</p>
+                <h4>Próximo às Feiras</h4>
+                <p>Localização privilegiada próxima à Feira José Avelino e Feirão Buraco da Gia.</p>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="feature-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <h4>Ambiente Familiar</h4>
+                <p>Pousada com ambiente acolhedor e atendimento personalizado.</p>
             </div>
         </div>
     </div>
@@ -137,9 +137,9 @@
             </div>
             <div class="col-lg-6">
                 <h2 class="section-title text-start">Sobre a Pousada Pajeu</h2>
-                <p>A Pousada Pajeu está localizada no coração de Serra Talhada, oferecendo o equilíbrio perfeito entre conforto, praticidade e hospitalidade nordestina.</p>
-                <p>Nossa história começou em 2010, com o sonho de oferecer uma hospedagem que destacasse o melhor da cultura sertaneja com o conforto que nossos hóspedes merecem.</p>
-                <p>Situados a apenas 5 minutos do centro da cidade, estamos próximos aos principais pontos turísticos e comerciais, proporcionando uma experiência conveniente para viajantes a negócios e turistas.</p>
+                <p>A Pousada Pajeu está localizada estrategicamente no coração de Fortaleza, oferecendo o equilíbrio perfeito entre conforto, praticidade e hospitalidade nordestina.</p>
+                <p>Nossa pousada familiar se destaca pela localização privilegiada, ficando ao lado da Feira da José Avelino e do Feirão da Madrugada Buraco da Gia, principais polos de moda atacadista da região.</p>
+                <p>Com fácil acesso ao centro comercial de Fortaleza, proporcionamos uma experiência conveniente e acolhedora tanto para comerciantes quanto para turistas que buscam as melhores oportunidades de compras.</p>
                 <a href="{% url 'website:sobre' %}" class="btn btn-primary mt-3">Conheça Nossa História</a>
             </div>
         </div>
@@ -161,7 +161,7 @@
                             <i class="fas fa-star text-warning"></i>
                             <i class="fas fa-star text-warning"></i>
                         </div>
-                        <p class="card-text">"Ótima estadia! Quartos muito confortáveis, café da manhã delicioso e equipe super atenciosa. Voltarei com certeza na próxima vez que estiver em Serra Talhada."</p>
+                        <p class="card-text">"Excelente localização para quem vem fazer compras! Fica praticamente ao lado da Feira José Avelino. Quartos confortáveis e equipe super atenciosa. Voltarei com certeza!"</p>
                         <p class="card-text text-end"><strong>Maria Silva</strong></p>
                     </div>
                 </div>
@@ -177,7 +177,7 @@
                             <i class="fas fa-star text-warning"></i>
                             <i class="fas fa-star text-warning"></i>
                         </div>
-                        <p class="card-text">"Localização perfeita para quem está a negócios. Estacionamento seguro, Wi-Fi excelente e o atendimento supera as expectativas. Recomendo!"</p>
+                        <p class="card-text">"Localização perfeita para quem vai fazer compras no Buraco da Gia. Estacionamento seguro, Wi-Fi excelente e o atendimento familiar faz toda diferença. Recomendo!"</p>
                         <p class="card-text text-end"><strong>João Santos</strong></p>
                     </div>
                 </div>
@@ -193,7 +193,7 @@
                             <i class="fas fa-star text-warning"></i>
                             <i class="fas fa-star-half-alt text-warning"></i>
                         </div>
-                        <p class="card-text">"Hospedagem familiar com excelente custo-benefício. A piscina é ótima para relaxar e as refeições são muito saborosas. Os funcionários são muito prestativos."</p>
+                        <p class="card-text">"Hospedagem familiar com excelente custo-benefício. A proximidade com as feiras de moda facilita muito a vida de quem vai a negócios. Os funcionários são muito prestativos."</p>
                         <p class="card-text text-end"><strong>Ana Oliveira</strong></p>
                     </div>
                 </div>
@@ -215,26 +215,26 @@
 <section id="localizacao" class="section">
     <div class="container">
         <h2 class="section-title">Nossa Localização</h2>
-        <p class="text-center mb-5">Estamos estrategicamente localizados no centro de Serra Talhada</p>
+        <p class="text-center mb-5">Estamos estrategicamente localizados no centro comercial de Fortaleza</p>
         
         <div class="row">
             <div class="col-md-6 mb-4 mb-md-0">
                 <div class="ratio ratio-16x9">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31608.737440988675!2d-38.31642236715819!3d-7.9867693999999895!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7a740022f8afa33%3A0x81c26d502877292c!2sSerra%20Talhada%2C%20PE!5e0!3m2!1spt-BR!2sbr!4v1690224013825!5m2!1spt-BR!2sbr" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3981.3500158309304!2d-38.52307432412929!3d-3.7206268437451217!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7c748547073fc45%3A0x769e892c163c326d!2sCentro%2C%20Fortaleza%20-%20CE!5e0!3m2!1spt-BR!2sbr!4v1690224013825!5m2!1spt-BR!2sbr" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
             <div class="col-md-6">
                 <h4>Como Chegar</h4>
-                <p><i class="fas fa-map-marker-alt text-primary me-2"></i> Rua Principal, 123 - Centro, Serra Talhada - PE, 56900-000</p>
-                <p><i class="fas fa-phone text-primary me-2"></i> (87) 3831-0000</p>
+                <p><i class="fas fa-map-marker-alt text-primary me-2"></i> Rua Baturité, 118 - Centro, Fortaleza - CE, 60055-000</p>
+                <p><i class="fas fa-phone text-primary me-2"></i> (85) 98583-6391</p>
                 <p><i class="fas fa-envelope text-primary me-2"></i> contato@pousadapajeu.com.br</p>
                 
                 <h5 class="mt-4">Pontos de Referência:</h5>
                 <ul>
-                    <li>5 minutos do centro comercial</li>
-                    <li>10 minutos da rodoviária</li>
-                    <li>15 minutos do Parque Estadual</li>
-                    <li>Próximo ao Shopping Serra Talhada</li>
+                    <li>Ao lado da Feira da José Avelino</li>
+                    <li>5 minutos do Feirão da Madrugada Buraco da Gia</li>
+                    <li>10 minutos do Centro Fashion Fortaleza</li>
+                    <li>Próximo ao centro comercial de Fortaleza</li>
                 </ul>
                 
                 <a href="https://goo.gl/maps/123" target="_blank" class="btn btn-outline-primary mt-3">

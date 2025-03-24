@@ -26,7 +26,7 @@
             <div class="col-lg-8 text-center">
                 <h2 class="section-title">Acomodações Confortáveis</h2>
                 <p class="lead mb-4">Oferecemos diferentes opções de acomodações para atender às suas necessidades com o máximo de conforto e qualidade.</p>
-                <p>Todos os nossos quartos possuem ar-condicionado, TV, Wi-Fi grátis, frigobar e banheiro privativo com amenidades. O café da manhã está incluso em todas as diárias.</p>
+                <p>Todos os nossos quartos possuem ar-condicionado, TV, Wi-Fi grátis, frigobar e banheiro privativo com amenidades. O café da manhã está incluso em todas as diárias, com opção de horário especial para quem vai às feiras da madrugada.</p>
             </div>
         </div>
     </div>
@@ -45,7 +45,7 @@
             <div class="col-lg-6">
                 <span class="badge bg-primary mb-2">A partir de R$ 120,00</span>
                 <h3>Quarto Standard</h3>
-                <p>Quarto confortável ideal para quem busca praticidade sem abrir mão do conforto. Perfeito para viajantes a negócios ou turistas que buscam uma opção econômica de qualidade.</p>
+                <p>Quarto confortável ideal para quem busca praticidade sem abrir mão do conforto. Perfeito para comerciantes e sacoleiros que visitam as feiras de moda de Fortaleza, oferecendo todo o conforto necessário após um dia de compras.</p>
                 
                 <h5 class="mt-4 mb-3">Características:</h5>
                 <ul class="quarto-features">
@@ -54,12 +54,12 @@
                     <li><i class="fas fa-ruler-combined"></i> 18m²</li>
                     <li><i class="fas fa-snowflake"></i> Ar-condicionado</li>
                     <li><i class="fas fa-tv"></i> TV LED 32"</li>
-                    <li><i class="fas fa-wifi"></i> Wi-Fi gratuito</li>
+                    <li><i class="fas fa-wifi"></i> Wi-Fi na recepção</li>
                     <li><i class="fas fa-shower"></i> Banheiro privativo com box</li>
                 </ul>
                 
                 <div class="d-flex mt-4">
-                    <a href="{% url 'reservas:nova_reserva' %}?tipo=standard" class="btn btn-primary me-2">Reservar</a>
+                    <a href="{% url 'reservas:criar' %}?tipo=standard" class="btn btn-primary me-2">Reservar</a>
                     <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalQuartoStandard">
                         <i class="fas fa-images me-1"></i> Ver mais fotos
                     </button>
@@ -77,7 +77,7 @@
             <div class="col-lg-6">
                 <span class="badge bg-primary mb-2">A partir de R$ 180,00</span>
                 <h3>Quarto Luxo</h3>
-                <p>Acomodação espaçosa e elegante, proporcionando conforto superior aos nossos hóspedes. Ideal para casais em lua de mel ou viajantes que buscam mais espaço e conforto.</p>
+                <p>Acomodação espaçosa e elegante, proporcionando conforto superior aos nossos hóspedes. Ideal para empresários e lojistas que valorizam mais espaço e conforto durante suas viagens de negócios às feiras atacadistas de Fortaleza.</p>
                 
                 <h5 class="mt-4 mb-3">Características:</h5>
                 <ul class="quarto-features">
@@ -86,13 +86,13 @@
                     <li><i class="fas fa-ruler-combined"></i> 25m²</li>
                     <li><i class="fas fa-snowflake"></i> Ar-condicionado split</li>
                     <li><i class="fas fa-tv"></i> Smart TV 43"</li>
-                    <li><i class="fas fa-wifi"></i> Wi-Fi gratuito</li>
+                    <li><i class="fas fa-wifi"></i> Wi-Fi na recepção</li>
                     <li><i class="fas fa-bath"></i> Banheiro privativo com banheira</li>
                     <li><i class="fas fa-coffee"></i> Cafeteira</li>
                 </ul>
                 
                 <div class="d-flex mt-4">
-                    <a href="{% url 'reservas:nova_reserva' %}?tipo=luxo" class="btn btn-primary me-2">Reservar</a>
+                    <a href="{% url 'reservas:criar' %}?tipo=luxo" class="btn btn-primary me-2">Reservar</a>
                     <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalQuartoLuxo">
                         <i class="fas fa-images me-1"></i> Ver mais fotos
                     </button>
@@ -110,7 +110,7 @@
             <div class="col-lg-6">
                 <span class="badge bg-primary mb-2">A partir de R$ 250,00</span>
                 <h3>Suíte Família</h3>
-                <p>Ampla suíte projetada especialmente para famílias, oferecendo espaço e conforto para todos. Ambiente aconchegante e funcional para uma estadia perfeita com as crianças.</p>
+                <p>Ampla suíte projetada especialmente para famílias ou grupos de comerciantes, oferecendo espaço e conforto para todos. Perfeita para equipes que viajam juntas para fazer compras nas feiras atacadistas de Fortaleza.</p>
                 
                 <h5 class="mt-4 mb-3">Características:</h5>
                 <ul class="quarto-features">
@@ -119,7 +119,7 @@
                     <li><i class="fas fa-ruler-combined"></i> 35m²</li>
                     <li><i class="fas fa-snowflake"></i> Ar-condicionado split</li>
                     <li><i class="fas fa-tv"></i> Smart TV 50"</li>
-                    <li><i class="fas fa-wifi"></i> Wi-Fi gratuito</li>
+                    <li><i class="fas fa-wifi"></i> Wi-Fi na recepção</li>
                     <li><i class="fas fa-shower"></i> Banheiro privativo amplo</li>
                     <li><i class="fas fa-couch"></i> Área de estar</li>
                     <li><i class="fas fa-coffee"></i> Cafeteira</li>
@@ -127,7 +127,7 @@
                 </ul>
                 
                 <div class="d-flex mt-4">
-                    <a href="{% url 'reservas:nova_reserva' %}?tipo=familia" class="btn btn-primary me-2">Reservar</a>
+                    <a href="{% url 'reservas:criar' %}?tipo=familia" class="btn btn-primary me-2">Reservar</a>
                     <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalSuiteFamilia">
                         <i class="fas fa-images me-1"></i> Ver mais fotos
                     </button>
@@ -148,7 +148,7 @@
                     <ul class="list-unstyled ms-4">
                         <li><strong>Check-in:</strong> a partir das 14h</li>
                         <li><strong>Check-out:</strong> até as 12h</li>
-                        <li><strong>Café da manhã:</strong> 06:30h às 10h</li>
+                        <li><strong>Café da manhã:</strong> 06:30h às 10h (flexível para frequentadores das feiras da madrugada)</li>
                     </ul>
                 </div>
                 
@@ -159,6 +159,8 @@
                         <li>Animais de estimação não são permitidos</li>
                         <li>Aceitamos crianças de todas as idades</li>
                         <li>Todas as crianças menores de 6 anos não pagam</li>
+                        <li>Serviço de despertador disponível para feiras da madrugada</li>
+                        <li>Wi-Fi disponível somente na área da recepção</li>
                     </ul>
                 </div>
             </div>
@@ -182,8 +184,9 @@
                     <p>Temos descontos para:</p>
                     <ul>
                         <li>Estadias acima de 7 dias</li>
-                        <li>Grupos e empresas</li>
-                        <li>Pacotes de final de semana</li>
+                        <li>Grupos de lojistas e sacoleiros</li>
+                        <li>Clientes frequentes das feiras de moda</li>
+                        <li>Reservas antecipadas (15 dias ou mais)</li>
                     </ul>
                     <p>Entre em contato conosco para mais informações sobre promoções especiais.</p>
                 </div>
@@ -196,8 +199,8 @@
 <section class="section bg-primary text-white">
     <div class="container text-center">
         <h2>Pronto para reservar seu quarto?</h2>
-        <p class="lead mb-4">Reserve diretamente conosco e garanta o melhor preço!</p>
-        <a href="{% url 'reservas:nova_reserva' %}" class="btn btn-warning btn-lg">Fazer Minha Reserva</a>
+        <p class="lead mb-4">Estamos ao lado das principais feiras de moda atacadista de Fortaleza!</p>
+        <a href="{% url 'reservas:criar' %}" class="btn btn-warning btn-lg">Fazer Minha Reserva</a>
     </div>
 </section>
 
@@ -235,7 +238,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                <a href="{% url 'reservas:nova_reserva' %}?tipo=standard" class="btn btn-primary">Reservar</a>
+                <a href="{% url 'reservas:criar' %}?tipo=standard" class="btn btn-primary">Reservar</a>
             </div>
         </div>
     </div>
@@ -274,7 +277,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                <a href="{% url 'reservas:nova_reserva' %}?tipo=luxo" class="btn btn-primary">Reservar</a>
+                <a href="{% url 'reservas:criar' %}?tipo=luxo" class="btn btn-primary">Reservar</a>
             </div>
         </div>
     </div>
@@ -313,7 +316,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                <a href="{% url 'reservas:nova_reserva' %}?tipo=familia" class="btn btn-primary">Reservar</a>
+                <a href="{% url 'reservas:criar' %}?tipo=familia" class="btn btn-primary">Reservar</a>
             </div>
         </div>
     </div>
