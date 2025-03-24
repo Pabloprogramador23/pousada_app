@@ -1,17 +1,17 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
-{% block title %}Pousada Pajeu - Sua melhor estadia em Fortaleza{% endblock %}
+{% block title %}Pousada Pajéu - Sua melhor estadia em Fortaleza{% endblock %}
 
 {% block content %}
 <!-- Banner Principal -->
 <section class="banner">
-    <img src="{% static 'img/banner.jpg' %}" alt="Pousada Pajeu" class="banner-img">
+    <img src="{% static 'img/banner.jpg' %}" alt="Pousada Pajéu" class="banner-img">
     <div class="banner-content">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8">
-                    <h1>Bem-vindo à Pousada Pajeu</h1>
+                    <h1>Bem-vindo à Pousada Pajéu</h1>
                     <p>Conforto, ambiente familiar e localização privilegiada próxima às principais feiras de moda em Fortaleza.</p>
                     <a href="{% url 'reservas:criar' %}" class="btn btn-warning btn-lg">Reservar Agora</a>
                 </div>
@@ -31,9 +31,9 @@
                 <div class="card">
                     <img src="{% static 'img/quarto-standard.jpg' %}" class="card-img-top" alt="Quarto Standard">
                     <div class="card-body">
-                        <h5 class="card-title">Quarto Standard</h5>
-                        <p class="card-text">Quarto confortável com cama de casal, ar-condicionado, TV e banheiro privativo.</p>
-                        <p class="card-price mb-3">A partir de R$ 120,00</p>
+                        <h5 class="card-title">Quarto casal</h5>
+                        <p class="card-text">Quarto confortável com cama de casal, ar-condicionado e banheiro privativo.</p>
+                        <p class="card-price mb-3">R$ 70,00 por pessoa (mínimo R$ 140,00)</p>
                         <a href="{% url 'website:quartos_lista' %}" class="btn btn-outline-primary">Ver Detalhes</a>
                     </div>
                 </div>
@@ -43,9 +43,9 @@
                 <div class="card">
                     <img src="{% static 'img/quarto-luxo.jpg' %}" class="card-img-top" alt="Quarto Luxo">
                     <div class="card-body">
-                        <h5 class="card-title">Quarto Luxo</h5>
-                        <p class="card-text">Quarto amplo com cama king size, ar-condicionado, smart TV e banheira.</p>
-                        <p class="card-price mb-3">A partir de R$ 180,00</p>
+                        <h5 class="card-title">Quarto Triplo</h5>
+                        <p class="card-text">Quarto amplo com 3 camas de solteiro e ar-condicionado.</p>
+                        <p class="card-price mb-3">R$ 70,00 por pessoa (mínimo R$ 140,00)</p>
                         <a href="{% url 'website:quartos_lista' %}" class="btn btn-outline-primary">Ver Detalhes</a>
                     </div>
                 </div>
@@ -57,7 +57,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Suíte Família</h5>
                         <p class="card-text">Suíte espaçosa com cama de casal e duas de solteiro, ideal para famílias.</p>
-                        <p class="card-price mb-3">A partir de R$ 250,00</p>
+                        <p class="card-price mb-3">R$ 70,00 por pessoa (mínimo R$ 140,00)</p>
                         <a href="{% url 'website:quartos_lista' %}" class="btn btn-outline-primary">Ver Detalhes</a>
                     </div>
                 </div>
@@ -98,7 +98,7 @@
                     <i class="fas fa-parking"></i>
                 </div>
                 <h4>Estacionamento</h4>
-                <p>Estacionamento privativo e seguro para todos os hóspedes.</p>
+                <p>Estacionamento para 1(um) veiculo privativo e seguro para os hóspedes.</p>
             </div>
             
             <div class="col-md-4 mb-4">
@@ -133,11 +133,11 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0">
-                <img src="{% static 'img/pousada-fachada.jpg' %}" alt="Fachada da Pousada Pajeu" class="img-fluid rounded">
+                <img src="{% static 'img/pousada-fachada.jpg' %}" alt="Fachada da Pousada Pajéu" class="img-fluid rounded">
             </div>
             <div class="col-lg-6">
-                <h2 class="section-title text-start">Sobre a Pousada Pajeu</h2>
-                <p>A Pousada Pajeu está localizada estrategicamente no coração de Fortaleza, oferecendo o equilíbrio perfeito entre conforto, praticidade e hospitalidade nordestina.</p>
+                <h2 class="section-title text-start">Sobre a Pousada Pajéu</h2>
+                <p>A Pousada Pajéu está localizada estrategicamente no coração de Fortaleza, oferecendo o equilíbrio perfeito entre conforto, praticidade e hospitalidade nordestina.</p>
                 <p>Nossa pousada familiar se destaca pela localização privilegiada, ficando ao lado da Feira da José Avelino e do Feirão da Madrugada Buraco da Gia, principais polos de moda atacadista da região.</p>
                 <p>Com fácil acesso ao centro comercial de Fortaleza, proporcionamos uma experiência conveniente e acolhedora tanto para comerciantes quanto para turistas que buscam as melhores oportunidades de compras.</p>
                 <a href="{% url 'website:sobre' %}" class="btn btn-primary mt-3">Conheça Nossa História</a>

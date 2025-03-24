@@ -5,6 +5,8 @@ from quartos.models import Quarto
 from hospedes.models import Hospede
 import logging
 import uuid
+from datetime import datetime, time
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -100,32 +102,68 @@ class Reserva(models.Model):
             if reservas_sobrepostas.exists():
                 raise ValidationError('Já existe uma reserva para este quarto no período selecionado.')
     
+    def calcular_total(self):
+        """
+        Calcula o valor total da reserva, multiplicando o valor da diária pelo número de dias.
+        
+        O cálculo é feito considerando o sistema de diárias de 24h (meio-dia a meio-dia),
+        onde cada diária começa a contar a partir do horário de entrada do hóspede.
+        """
+        if not self.check_in or not self.check_out:
+            return 0
+            
+        # Verifica se check_in e check_out são datetime ou só date
+        if isinstance(self.check_in, datetime) and isinstance(self.check_out, datetime):
+            # Se já temos datetime com horas
+            delta = self.check_out - self.check_in
+        else:
+            # Se temos apenas datas, considera meio-dia a meio-dia
+            # Converte para datetime com hora padrão de check-in às 14h
+            check_in_datetime = datetime.combine(self.check_in, time(14, 0))
+            check_out_datetime = datetime.combine(self.check_out, time(12, 0))
+            delta = check_out_datetime - check_in_datetime
+            
+        # Calcula número de diárias (arredondando para cima qualquer fração de hora)
+        total_horas = delta.total_seconds() / 3600
+        total_diarias = math.ceil(total_horas / 24)
+        
+        # O valor por pessoa é de R$ 70,00
+        valor_por_pessoa = 70
+        
+        # O valor mínimo do quarto é de R$ 140,00 (mesmo com 1 pessoa)
+        valor_minimo_quarto = 140
+        
+        # Calcula valor baseado no número de pessoas
+        valor_por_diaria = max(valor_minimo_quarto, (self.adultos + self.criancas) * valor_por_pessoa)
+        
+        # Valor total é o valor da diária multiplicado pelo número de diárias
+        return valor_por_diaria * total_diarias
+    
     def save(self, *args, **kwargs):
         """
-        Sobrescreve o método save para gerar o código da reserva, calcular o valor total
-        e registrar no log quando uma reserva é criada ou atualizada.
+        Sobrescreve o método save para atualizar valores e status antes de salvar.
         """
-        # Gera código da reserva se não existir
-        if not self.codigo:
-            # Usa UUID para gerar um código único
-            uid = str(uuid.uuid4()).replace('-', '')[:8].upper()
-            self.codigo = f'RES{timezone.now().strftime("%y%m%d")}{uid}'
-        
-        # Calcula o valor da diária e o valor total
-        if not self.valor_diaria and self.quarto:
-            self.valor_diaria = self.quarto.preco_diaria
+        # Calcula o valor total da reserva
+        if not self.valor_total or self.valor_total == 0:
+            self.valor_diaria = max(140, (self.adultos + self.criancas) * 70)
+            self.valor_total = self.calcular_total()
             
-        if self.check_in and self.check_out and self.valor_diaria:
-            dias = (self.check_out - self.check_in).days
-            self.valor_total = self.valor_diaria * dias
-        
-        # Atualiza flags de acordo com o status
+        # Atualiza os flags baseado no status
         if self.status == 'confirmada':
             self.confirmada = True
             self.cancelada = False
         elif self.status == 'cancelada':
             self.cancelada = True
             self.confirmada = False
+        elif self.status == 'pendente':
+            self.confirmada = False
+            self.cancelada = False
+            
+        # Gera código da reserva se não existir
+        if not self.codigo:
+            # Usa UUID para gerar um código único
+            uid = str(uuid.uuid4()).replace('-', '')[:8].upper()
+            self.codigo = f'RES{timezone.now().strftime("%y%m%d")}{uid}'
         
         is_new = self.pk is None
         super().save(*args, **kwargs)

@@ -1,12 +1,12 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
-{% block title %}Quartos e Acomodações - Pousada Pajeu{% endblock %}
+{% block title %}Quartos e Acomodações - Pousada Pajéu{% endblock %}
 
 {% block content %}
 <!-- Banner da Página -->
 <section class="banner">
-    <img src="{% static 'img/banner-quartos.jpg' %}" alt="Quartos Pousada Pajeu" class="banner-img">
+    <img src="{% static 'img/banner-quartos.jpg' %}" alt="Quartos Pousada Pajéu" class="banner-img">
     <div class="banner-content">
         <div class="container">
             <div class="row">
@@ -26,7 +26,7 @@
             <div class="col-lg-8 text-center">
                 <h2 class="section-title">Acomodações Confortáveis</h2>
                 <p class="lead mb-4">Oferecemos diferentes opções de acomodações para atender às suas necessidades com o máximo de conforto e qualidade.</p>
-                <p>Todos os nossos quartos possuem ar-condicionado, TV, Wi-Fi grátis, frigobar e banheiro privativo com amenidades. O café da manhã está incluso em todas as diárias, com opção de horário especial para quem vai às feiras da madrugada.</p>
+                <p>Todos os nossos quartos possuem ar-condicionado, frigobar e banheiro privativo com amenidades. O café da manhã está incluso em todas as diárias, com opção de horário especial para quem vai às feiras da madrugada.</p>
             </div>
         </div>
     </div>
@@ -43,7 +43,7 @@
                 </div>
             </div>
             <div class="col-lg-6">
-                <span class="badge bg-primary mb-2">A partir de R$ 120,00</span>
+                <span class="badge bg-primary mb-2">R$ 70,00 por pessoa (mínimo R$ 140,00)</span>
                 <h3>Quarto Standard</h3>
                 <p>Quarto confortável ideal para quem busca praticidade sem abrir mão do conforto. Perfeito para comerciantes e sacoleiros que visitam as feiras de moda de Fortaleza, oferecendo todo o conforto necessário após um dia de compras.</p>
                 
@@ -53,7 +53,6 @@
                     <li><i class="fas fa-user-friends"></i> Acomoda até 2 pessoas</li>
                     <li><i class="fas fa-ruler-combined"></i> 18m²</li>
                     <li><i class="fas fa-snowflake"></i> Ar-condicionado</li>
-                    <li><i class="fas fa-tv"></i> TV LED 32"</li>
                     <li><i class="fas fa-wifi"></i> Wi-Fi na recepção</li>
                     <li><i class="fas fa-shower"></i> Banheiro privativo com box</li>
                 </ul>
@@ -75,7 +74,7 @@
                 </div>
             </div>
             <div class="col-lg-6">
-                <span class="badge bg-primary mb-2">A partir de R$ 180,00</span>
+                <span class="badge bg-primary mb-2">R$ 70,00 por pessoa (mínimo R$ 140,00)</span>
                 <h3>Quarto Luxo</h3>
                 <p>Acomodação espaçosa e elegante, proporcionando conforto superior aos nossos hóspedes. Ideal para empresários e lojistas que valorizam mais espaço e conforto durante suas viagens de negócios às feiras atacadistas de Fortaleza.</p>
                 
@@ -85,7 +84,6 @@
                     <li><i class="fas fa-user-friends"></i> Acomoda até 2 pessoas</li>
                     <li><i class="fas fa-ruler-combined"></i> 25m²</li>
                     <li><i class="fas fa-snowflake"></i> Ar-condicionado split</li>
-                    <li><i class="fas fa-tv"></i> Smart TV 43"</li>
                     <li><i class="fas fa-wifi"></i> Wi-Fi na recepção</li>
                     <li><i class="fas fa-bath"></i> Banheiro privativo com banheira</li>
                     <li><i class="fas fa-coffee"></i> Cafeteira</li>
@@ -108,7 +106,7 @@
                 </div>
             </div>
             <div class="col-lg-6">
-                <span class="badge bg-primary mb-2">A partir de R$ 250,00</span>
+                <span class="badge bg-primary mb-2">R$ 70,00 por pessoa (mínimo R$ 140,00)</span>
                 <h3>Suíte Família</h3>
                 <p>Ampla suíte projetada especialmente para famílias ou grupos de comerciantes, oferecendo espaço e conforto para todos. Perfeita para equipes que viajam juntas para fazer compras nas feiras atacadistas de Fortaleza.</p>
                 
@@ -118,12 +116,8 @@
                     <li><i class="fas fa-user-friends"></i> Acomoda até 4 pessoas</li>
                     <li><i class="fas fa-ruler-combined"></i> 35m²</li>
                     <li><i class="fas fa-snowflake"></i> Ar-condicionado split</li>
-                    <li><i class="fas fa-tv"></i> Smart TV 50"</li>
                     <li><i class="fas fa-wifi"></i> Wi-Fi na recepção</li>
                     <li><i class="fas fa-shower"></i> Banheiro privativo amplo</li>
-                    <li><i class="fas fa-couch"></i> Área de estar</li>
-                    <li><i class="fas fa-coffee"></i> Cafeteira</li>
-                    <li><i class="fas fa-baby"></i> Berço disponível (sob solicitação)</li>
                 </ul>
                 
                 <div class="d-flex mt-4">
@@ -146,8 +140,8 @@
                 <div class="mb-4">
                     <h5><i class="far fa-clock text-primary me-2"></i> Horários</h5>
                     <ul class="list-unstyled ms-4">
-                        <li><strong>Check-in:</strong> a partir das 14h</li>
-                        <li><strong>Check-out:</strong> até as 12h</li>
+                        <li><strong>Check-in:</strong> horário flexível</li>
+                        <li><strong>Check-out:</strong> 24h após o check-in</li>
                         <li><strong>Café da manhã:</strong> 06:30h às 10h (flexível para frequentadores das feiras da madrugada)</li>
                     </ul>
                 </div>
@@ -180,15 +174,14 @@
                 </div>
                 
                 <div>
-                    <h5><i class="fas fa-tag text-primary me-2"></i> Promoções Especiais</h5>
-                    <p>Temos descontos para:</p>
+                    <h5><i class="fas fa-tag text-primary me-2"></i> Informação de Preços</h5>
+                    <p>Nossos preços são calculados da seguinte forma:</p>
                     <ul>
-                        <li>Estadias acima de 7 dias</li>
-                        <li>Grupos de lojistas e sacoleiros</li>
-                        <li>Clientes frequentes das feiras de moda</li>
-                        <li>Reservas antecipadas (15 dias ou mais)</li>
+                        <li>R$ 70,00 por pessoa por diária</li>
+                        <li>Valor mínimo do quarto: R$ 140,00</li>
+                        <li>Diária contabilizada a cada 24h a partir do horário de entrada</li>
                     </ul>
-                    <p>Entre em contato conosco para mais informações sobre promoções especiais.</p>
+                    <p>Exemplo: Um grupo de 3 pessoas pagará R$ 210,00 por diária.</p>
                 </div>
             </div>
         </div>

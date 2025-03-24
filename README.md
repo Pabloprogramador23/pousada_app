@@ -1,4 +1,4 @@
-# Sistema de Gerenciamento - Pousada Pajeu
+# Sistema de Gerenciamento - Pousada Pajéu
 
 Sistema para gerenciamento de pousada desenvolvido com Django.
 

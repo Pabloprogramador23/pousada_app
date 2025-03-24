@@ -1,7 +1,7 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
-{% block title %}Reserva Confirmada - Pousada Pajeú{% endblock %}
+{% block title %}Reserva Confirmada - Pousada Pajéu{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -117,12 +117,12 @@
                 
                 <div class="detail-row">
                     <span class="detail-label">Check-in:</span>
-                    <span>{{ reserva.check_in|date:"d/m/Y" }} (a partir das 14h)</span>
+                    <span>{{ reserva.check_in|date:"d/m/Y" }} (horário flexível)</span>
                 </div>
                 
                 <div class="detail-row">
                     <span class="detail-label">Check-out:</span>
-                    <span>{{ reserva.check_out|date:"d/m/Y" }} (até às 12h)</span>
+                    <span>{{ reserva.check_out|date:"d/m/Y" }} (mesmo horário do check-in)</span>
                 </div>
                 
                 <div class="detail-row">
@@ -176,7 +176,7 @@
                 
                 <div class="detail-row">
                     <span class="detail-label">Valor da diária:</span>
-                    <span>R$ {{ reserva.valor_diaria|floatformat:2 }}</span>
+                    <span>R$ {{ reserva.valor_diaria|floatformat:2 }} (R$ 70,00 por pessoa, mínimo R$ 140,00)</span>
                 </div>
                 
                 <div class="detail-row">
@@ -198,8 +198,12 @@
                     <i class="fas fa-info-circle me-2"></i> Enviamos um e-mail com os detalhes da sua reserva para {{ reserva.hospede.email }}. Caso não o encontre, verifique sua caixa de spam ou entre em contato conosco.
                 </div>
                 
+                <div class="alert alert-info mt-3" role="alert">
+                    <i class="fas fa-info-circle me-2"></i> <strong>Informação sobre diárias:</strong> Na Pousada Pajéu, as diárias são contabilizadas a cada 24 horas a partir do horário de entrada. Por exemplo, se você fizer check-in às 20h, sua diária vence às 20h do dia seguinte.
+                </div>
+                
                 <p><strong>Nossa Localização:</strong></p>
-                <p>A Pousada Pajeú está estrategicamente localizada para atender os compradores das feiras de moda de Fortaleza:</p>
+                <p>A Pousada Pajéu está estrategicamente localizada para atender os compradores das feiras de moda de Fortaleza:</p>
                 <ul>
                     <li>Rua Baturité, 118 - Centro, Fortaleza - CE</li>
                     <li>Apenas 2 minutos a pé da Feira da José Avelino (Feira da Madrugada)</li>

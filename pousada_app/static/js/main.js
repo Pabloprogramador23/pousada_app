@@ -1,5 +1,5 @@
 /**
- * Funções JavaScript para o site da Pousada Pajeu
+ * Funções JavaScript para o site da Pousada Pajéu
  */
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializa tooltips do Bootstrap
