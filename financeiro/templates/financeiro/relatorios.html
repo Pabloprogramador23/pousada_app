@@ -1,0 +1,494 @@
+{% extends 'financeiro/base_financeiro.html' %}
+{% load static %}
+
+{% block page_title %}Relatórios Financeiros{% endblock %}
+
+{% block page_actions %}
+<form class="row g-3" method="get">
+    <div class="col-auto">
+        {{ form_filtro.data_inicio }}
+    </div>
+    <div class="col-auto">
+        {{ form_filtro.data_fim }}
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+    <div class="col-auto">
+        <a href="?{{ request.GET.urlencode }}&export=pdf" class="btn btn-outline-danger"><i class="fas fa-file-pdf"></i> Exportar PDF</a>
+    </div>
+</form>
+{% endblock %}
+
+{% block financeiro_content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-pie"></i> Resumo do Período ({{ data_inicio }} a {{ data_fim }})</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="border rounded p-3 text-center mb-3">
+                            <h6>Receitas (Reservas)</h6>
+                            <h3 class="text-primary">R$ {{ total_pagamentos|floatformat:2 }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3 text-center mb-3">
+                            <h6>Outras Receitas</h6>
+                            <h3 class="text-success">R$ {{ total_receitas|floatformat:2 }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3 text-center mb-3">
+                            <h6>Despesas</h6>
+                            <h3 class="text-danger">R$ {{ total_despesas|floatformat:2 }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3 text-center mb-3">
+                            <h6>Saldo</h6>
+                            <h3 class="{% if saldo_periodo < 0 %}text-danger{% else %}text-info{% endif %}">
+                                R$ {{ saldo_periodo|floatformat:2 }}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Relatório de Pagamentos -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-money-check-alt"></i> Pagamentos por Status</h5>
+                <a href="{% url 'financeiro:pagamentos' %}" class="btn btn-sm btn-outline-primary">Ver Todos</a>
+            </div>
+            <div class="card-body">
+                {% if pagamentos_por_status %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th class="text-center">Quantidade</th>
+                                <th class="text-end">Valor Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for status, data in pagamentos_por_status.items %}
+                            <tr>
+                                <td>
+                                    {% if status == 'aprovado' %}
+                                    <span class="badge bg-success">Aprovado</span>
+                                    {% elif status == 'pendente' %}
+                                    <span class="badge bg-warning text-dark">Pendente</span>
+                                    {% elif status == 'recusado' %}
+                                    <span class="badge bg-danger">Recusado</span>
+                                    {% elif status == 'estornado' %}
+                                    <span class="badge bg-secondary">Estornado</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ data.quantidade }}</td>
+                                <td class="text-end">R$ {{ data.total|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3">
+                    <canvas id="pagamentosChart" height="200"></canvas>
+                </div>
+                {% else %}
+                <p class="text-center">Não há pagamentos registrados no período selecionado.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Relatório de Receitas -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-hand-holding-usd"></i> Receitas por Categoria</h5>
+                <a href="{% url 'financeiro:receitas' %}" class="btn btn-sm btn-outline-primary">Ver Todas</a>
+            </div>
+            <div class="card-body">
+                {% if receitas_por_categoria %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Categoria</th>
+                                <th class="text-center">Quantidade</th>
+                                <th class="text-end">Valor Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for categoria, data in receitas_por_categoria.items %}
+                            <tr>
+                                <td>
+                                    {% if categoria == 'aluguel' %}
+                                    Aluguel de Ponto Comercial
+                                    {% elif categoria == 'freela' %}
+                                    Serviços Freelancer
+                                    {% elif categoria == 'eventos' %}
+                                    Eventos
+                                    {% elif categoria == 'produtos' %}
+                                    Venda de Produtos
+                                    {% else %}
+                                    Outros
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ data.quantidade }}</td>
+                                <td class="text-end">R$ {{ data.total|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3">
+                    <canvas id="receitasChart" height="200"></canvas>
+                </div>
+                {% else %}
+                <p class="text-center">Não há receitas registradas no período selecionado.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Relatório de Despesas -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-file-invoice-dollar"></i> Despesas por Categoria</h5>
+                <a href="{% url 'financeiro:despesas' %}" class="btn btn-sm btn-outline-primary">Ver Todas</a>
+            </div>
+            <div class="card-body">
+                {% if despesas_por_categoria %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Categoria</th>
+                                <th class="text-center">Quantidade</th>
+                                <th class="text-end">Valor Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for categoria, data in despesas_por_categoria.items %}
+                            <tr>
+                                <td>
+                                    {% if categoria == 'manutencao' %}
+                                    Manutenção
+                                    {% elif categoria == 'limpeza' %}
+                                    Limpeza
+                                    {% elif categoria == 'alimentacao' %}
+                                    Alimentação
+                                    {% elif categoria == 'energia' %}
+                                    Energia Elétrica
+                                    {% elif categoria == 'agua' %}
+                                    Água
+                                    {% elif categoria == 'internet' %}
+                                    Internet
+                                    {% elif categoria == 'funcionarios' %}
+                                    Funcionários
+                                    {% elif categoria == 'impostos' %}
+                                    Impostos
+                                    {% elif categoria == 'marketing' %}
+                                    Marketing
+                                    {% else %}
+                                    Outros
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ data.quantidade }}</td>
+                                <td class="text-end">R$ {{ data.total|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3">
+                    <canvas id="despesasChart" height="200"></canvas>
+                </div>
+                {% else %}
+                <p class="text-center">Não há despesas registradas no período selecionado.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Relatório de Ocupação -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bed"></i> Ocupação no Período</h5>
+            </div>
+            <div class="card-body">
+                {% if ocupacao_diaria %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Quartos Ocupados</th>
+                                <th>Taxa de Ocupação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dia in ocupacao_diaria %}
+                            <tr>
+                                <td>{{ dia.data }}</td>
+                                <td>{{ dia.quartos_ocupados }} / {{ dia.total_quartos }}</td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ dia.taxa_ocupacao }}%;" aria-valuenow="{{ dia.taxa_ocupacao }}" aria-valuemin="0" aria-valuemax="100">{{ dia.taxa_ocupacao }}%</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3">
+                    <canvas id="ocupacaoChart" height="200"></canvas>
+                </div>
+                {% else %}
+                <p class="text-center">Não há dados de ocupação para o período selecionado.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block financeiro_js %}
+<script>
+    // Funções para gerar cores aleatórias consistentes
+    function stringToColor(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        let color = '#';
+        for (let i = 0; i < 3; i++) {
+            let value = (hash >> (i * 8)) & 0xFF;
+            color += ('00' + value.toString(16)).substr(-2);
+        }
+        return color;
+    }
+    
+    function getChartColors(keys) {
+        return keys.map(key => stringToColor(key));
+    }
+    
+    // Gráfico de Pagamentos por Status
+    {% if pagamentos_por_status %}
+    var pagamentosCanvas = document.getElementById('pagamentosChart').getContext('2d');
+    var pagamentosLabels = [
+        {% for status, _ in pagamentos_por_status.items %}
+            '{% if status == "aprovado" %}Aprovado{% elif status == "pendente" %}Pendente{% elif status == "recusado" %}Recusado{% elif status == "estornado" %}Estornado{% endif %}',
+        {% endfor %}
+    ];
+    var pagamentosData = [
+        {% for _, data in pagamentos_por_status.items %}
+            {{ data.total }},
+        {% endfor %}
+    ];
+    var pagamentosColors = [
+        {% for status, _ in pagamentos_por_status.items %}
+            '{% if status == "aprovado" %}#28a745{% elif status == "pendente" %}#ffc107{% elif status == "recusado" %}#dc3545{% elif status == "estornado" %}#6c757d{% endif %}',
+        {% endfor %}
+    ];
+    
+    new Chart(pagamentosCanvas, {
+        type: 'pie',
+        data: {
+            labels: pagamentosLabels,
+            datasets: [{
+                data: pagamentosData,
+                backgroundColor: pagamentosColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            var label = context.label || '';
+                            var value = context.raw || 0;
+                            return label + ': R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+    
+    // Gráfico de Receitas por Categoria
+    {% if receitas_por_categoria %}
+    var receitasCanvas = document.getElementById('receitasChart').getContext('2d');
+    var receitasLabels = [
+        {% for categoria, _ in receitas_por_categoria.items %}
+            '{% if categoria == "aluguel" %}Aluguel{% elif categoria == "freela" %}Freela{% elif categoria == "eventos" %}Eventos{% elif categoria == "produtos" %}Produtos{% else %}Outros{% endif %}',
+        {% endfor %}
+    ];
+    var receitasData = [
+        {% for _, data in receitas_por_categoria.items %}
+            {{ data.total }},
+        {% endfor %}
+    ];
+    var receitasColors = getChartColors([
+        {% for categoria, _ in receitas_por_categoria.items %}
+            '{{ categoria }}',
+        {% endfor %}
+    ]);
+    
+    new Chart(receitasCanvas, {
+        type: 'doughnut',
+        data: {
+            labels: receitasLabels,
+            datasets: [{
+                data: receitasData,
+                backgroundColor: receitasColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            var label = context.label || '';
+                            var value = context.raw || 0;
+                            return label + ': R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+    
+    // Gráfico de Despesas por Categoria
+    {% if despesas_por_categoria %}
+    var despesasCanvas = document.getElementById('despesasChart').getContext('2d');
+    var despesasLabels = [
+        {% for categoria, _ in despesas_por_categoria.items %}
+            '{% if categoria == "manutencao" %}Manutenção{% elif categoria == "limpeza" %}Limpeza{% elif categoria == "alimentacao" %}Alimentação{% elif categoria == "energia" %}Energia{% elif categoria == "agua" %}Água{% elif categoria == "internet" %}Internet{% elif categoria == "funcionarios" %}Funcionários{% elif categoria == "impostos" %}Impostos{% elif categoria == "marketing" %}Marketing{% else %}Outros{% endif %}',
+        {% endfor %}
+    ];
+    var despesasData = [
+        {% for _, data in despesas_por_categoria.items %}
+            {{ data.total }},
+        {% endfor %}
+    ];
+    var despesasColors = getChartColors([
+        {% for categoria, _ in despesas_por_categoria.items %}
+            '{{ categoria }}',
+        {% endfor %}
+    ]);
+    
+    new Chart(despesasCanvas, {
+        type: 'pie',
+        data: {
+            labels: despesasLabels,
+            datasets: [{
+                data: despesasData,
+                backgroundColor: despesasColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            var label = context.label || '';
+                            var value = context.raw || 0;
+                            return label + ': R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+    
+    // Gráfico de Ocupação
+    {% if ocupacao_diaria %}
+    var ocupacaoCanvas = document.getElementById('ocupacaoChart').getContext('2d');
+    var ocupacaoLabels = [
+        {% for dia in ocupacao_diaria %}
+            '{{ dia.data }}',
+        {% endfor %}
+    ];
+    var ocupacaoData = [
+        {% for dia in ocupacao_diaria %}
+            {{ dia.taxa_ocupacao }},
+        {% endfor %}
+    ];
+    
+    new Chart(ocupacaoCanvas, {
+        type: 'line',
+        data: {
+            labels: ocupacaoLabels,
+            datasets: [{
+                label: 'Taxa de Ocupação (%)',
+                data: ocupacaoData,
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            var label = context.dataset.label || '';
+                            var value = context.raw || 0;
+                            return label + ': ' + value + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %} 

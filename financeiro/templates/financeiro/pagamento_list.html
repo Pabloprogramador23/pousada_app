@@ -1,0 +1,303 @@
+{% extends "financeiro/base_financeiro.html" %}
+{% load static %}
+
+{% block title %}Pagamentos - Pousada Pajeú{% endblock %}
+
+{% block page_title %}Gerenciamento de Pagamentos{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'financeiro:pagamento_novo' %}" class="btn btn-sm btn-primary">
+    <i class="fas fa-plus me-1"></i> Novo Pagamento
+</a>
+{% endblock %}
+
+{% block financeiro_content %}
+<div class="container-fluid p-0">
+    <div class="row mb-2">
+        <div class="col-12">
+            <small class="text-muted">Controle de todos os pagamentos recebidos na pousada</small>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-filter me-2"></i> Filtros</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="aprovado" {% if request.GET.status == 'aprovado' %}selected{% endif %}>Aprovado</option>
+                        <option value="pendente" {% if request.GET.status == 'pendente' %}selected{% endif %}>Pendente</option>
+                        <option value="rejeitado" {% if request.GET.status == 'rejeitado' %}selected{% endif %}>Rejeitado</option>
+                        <option value="estornado" {% if request.GET.status == 'estornado' %}selected{% endif %}>Estornado</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="tipo" class="form-label">Tipo de Pagamento</label>
+                    <select name="tipo" id="tipo" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="dinheiro" {% if request.GET.tipo == 'dinheiro' %}selected{% endif %}>Dinheiro</option>
+                        <option value="cartao_credito" {% if request.GET.tipo == 'cartao_credito' %}selected{% endif %}>Cartão de Crédito</option>
+                        <option value="cartao_debito" {% if request.GET.tipo == 'cartao_debito' %}selected{% endif %}>Cartão de Débito</option>
+                        <option value="pix" {% if request.GET.tipo == 'pix' %}selected{% endif %}>PIX</option>
+                        <option value="transferencia" {% if request.GET.tipo == 'transferencia' %}selected{% endif %}>Transferência</option>
+                        <option value="deposito" {% if request.GET.tipo == 'deposito' %}selected{% endif %}>Depósito</option>
+                        <option value="outros" {% if request.GET.tipo == 'outros' %}selected{% endif %}>Outros</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="data_inicio" class="form-label">Data Início</label>
+                    <input type="date" name="data_inicio" id="data_inicio" class="form-control" value="{{ request.GET.data_inicio }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="data_fim" class="form-label">Data Fim</label>
+                    <input type="date" name="data_fim" id="data_fim" class="form-control" value="{{ request.GET.data_fim }}">
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i> Filtrar
+                    </button>
+                    <a href="{% url 'financeiro:pagamentos' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-eraser me-1"></i> Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resumo -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Aprovados</h6>
+                            <h2 class="mb-0 mt-2">R$ {{ total_aprovados|default:"0.00"|floatformat:2 }}</h2>
+                        </div>
+                        <div class="text-white">
+                            <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Pendentes</h6>
+                            <h2 class="mb-0 mt-2">R$ {{ total_pendentes|default:"0.00"|floatformat:2 }}</h2>
+                        </div>
+                        <div class="text-white">
+                            <i class="fas fa-clock fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Rejeitados/Estornados</h6>
+                            <h2 class="mb-0 mt-2">R$ {{ total_rejeitados|default:"0.00"|floatformat:2 }}</h2>
+                        </div>
+                        <div class="text-white">
+                            <i class="fas fa-times-circle fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Total Geral</h6>
+                            <h2 class="mb-0 mt-2">R$ {{ total_geral|default:"0.00"|floatformat:2 }}</h2>
+                        </div>
+                        <div class="text-white">
+                            <i class="fas fa-money-check-alt fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Listagem de Pagamentos -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i> Pagamentos Encontrados</h5>
+                <span class="badge bg-primary">{{ pagamentos.count }} pagamentos</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Reserva</th>
+                            <th>Valor</th>
+                            <th>Tipo</th>
+                            <th>Status</th>
+                            <th>Data Pagamento</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if pagamentos %}
+                            {% for pagamento in pagamentos %}
+                                <tr>
+                                    <td>{{ pagamento.id }}</td>
+                                    <td>
+                                        {% if pagamento.reserva %}
+                                            <a href="{% url 'reservas:detalhe' pagamento.reserva.id %}" class="text-decoration-none">
+                                                #{{ pagamento.reserva.id }} - {{ pagamento.reserva.hospede.nome }}
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">--</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>R$ {{ pagamento.valor|floatformat:2 }}</td>
+                                    <td>
+                                        {% if pagamento.tipo == 'dinheiro' %}
+                                            <span class="badge bg-success">Dinheiro</span>
+                                        {% elif pagamento.tipo == 'cartao_credito' %}
+                                            <span class="badge bg-primary">Cartão de Crédito</span>
+                                        {% elif pagamento.tipo == 'cartao_debito' %}
+                                            <span class="badge bg-info">Cartão de Débito</span>
+                                        {% elif pagamento.tipo == 'pix' %}
+                                            <span class="badge bg-warning">PIX</span>
+                                        {% elif pagamento.tipo == 'transferencia' %}
+                                            <span class="badge bg-secondary">Transferência</span>
+                                        {% elif pagamento.tipo == 'deposito' %}
+                                            <span class="badge bg-light text-dark">Depósito</span>
+                                        {% else %}
+                                            <span class="badge bg-dark">{{ pagamento.get_tipo_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if pagamento.status == 'aprovado' %}
+                                            <span class="badge bg-success">Aprovado</span>
+                                        {% elif pagamento.status == 'pendente' %}
+                                            <span class="badge bg-warning">Pendente</span>
+                                        {% elif pagamento.status == 'rejeitado' %}
+                                            <span class="badge bg-danger">Rejeitado</span>
+                                        {% elif pagamento.status == 'estornado' %}
+                                            <span class="badge bg-danger">Estornado</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ pagamento.data_pagamento|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="acoesPagamento{{ pagamento.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Ações
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="acoesPagamento{{ pagamento.id }}">
+                                                <li><a class="dropdown-item" href="{% url 'financeiro:pagamento_detalhe' pagamento.id %}"><i class="fas fa-eye me-2"></i> Detalhes</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'financeiro:pagamento_editar' pagamento.id %}"><i class="fas fa-edit me-2"></i> Editar</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'financeiro:recibo_pagamento' pagamento.id %}"><i class="fas fa-file-invoice me-2"></i> Recibo</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                {% if pagamento.status == 'pendente' %}
+                                                    <li><a class="dropdown-item text-success" href="{% url 'financeiro:pagamento_aprovar' pagamento.id %}"><i class="fas fa-check me-2"></i> Aprovar</a></li>
+                                                    <li><a class="dropdown-item text-danger" href="{% url 'financeiro:pagamento_rejeitar' pagamento.id %}"><i class="fas fa-times me-2"></i> Rejeitar</a></li>
+                                                {% elif pagamento.status == 'aprovado' %}
+                                                    <li><a class="dropdown-item text-danger" href="{% url 'financeiro:pagamento_estornar' pagamento.id %}"><i class="fas fa-undo me-2"></i> Estornar</a></li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-3">
+                                    <div class="alert alert-info mb-0">
+                                        <i class="fas fa-info-circle me-2"></i> Nenhum pagamento encontrado com os filtros selecionados.
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paginação -->
+    {% if is_paginated %}
+    <div class="mt-4">
+        <nav aria-label="Paginação">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Primeira">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Anterior">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Primeira">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Anterior">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for i in paginator.page_range %}
+                    {% if page_obj.number == i %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                    {% elif i > page_obj.number|add:"-3" and i < page_obj.number|add:"3" %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Próxima">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Última">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Próxima">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Última">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

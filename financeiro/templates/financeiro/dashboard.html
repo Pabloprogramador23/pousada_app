@@ -1,0 +1,295 @@
+{% extends 'financeiro/base_financeiro.html' %}
+{% load static %}
+
+{% block page_title %}Dashboard Financeiro{% endblock %}
+
+{% block page_actions %}
+<form class="row g-3" method="get">
+    <div class="col-auto">
+        {{ form_filtro.data_inicio }}
+    </div>
+    <div class="col-auto">
+        {{ form_filtro.data_fim }}
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block financeiro_content %}
+<div class="row">
+    <!-- Resumo Financeiro -->
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-money-bill-wave"></i> Receitas Totais</h5>
+                <h2 class="card-text">R$ {{ total_pagamentos|floatformat:2 }}</h2>
+                <p class="card-text text-white-50">Reservas</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-hand-holding-usd"></i> Outras Receitas</h5>
+                <h2 class="card-text">R$ {{ total_receitas|floatformat:2 }}</h2>
+                <p class="card-text text-white-50">Aluguéis, freelas, etc.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-danger mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-file-invoice-dollar"></i> Despesas</h5>
+                <h2 class="card-text">R$ {{ total_despesas|floatformat:2 }}</h2>
+                <p class="card-text text-white-50">Contas, manutenção, etc.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card {% if saldo_periodo < 0 %}text-white bg-danger{% else %}text-white bg-info{% endif %} mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-balance-scale"></i> Saldo do Período</h5>
+                <h2 class="card-text">R$ {{ saldo_periodo|floatformat:2 }}</h2>
+                <p class="card-text text-white-50">{{ data_inicio }} a {{ data_fim }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Gráfico de Receitas x Despesas -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-line"></i> Receitas x Despesas (Últimos 6 meses)
+            </div>
+            <div class="card-body">
+                <canvas id="financialChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resumo de Ocupação -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-hotel"></i> Ocupação Atual
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>Quartos Ocupados</div>
+                    <div><strong>{{ quartos_ocupados }} / {{ total_quartos }}</strong></div>
+                </div>
+                <div class="progress mb-3" style="height: 25px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ taxa_ocupacao }}%;" aria-valuenow="{{ taxa_ocupacao }}" aria-valuemin="0" aria-valuemax="100">{{ taxa_ocupacao }}%</div>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{% url 'financeiro:calendario' %}" class="btn btn-outline-primary">Ver Calendário</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-calendar-check"></i> Reservas no Período
+            </div>
+            <div class="card-body">
+                <h3 class="text-center">{{ total_reservas }}</h3>
+                <p class="text-center text-muted">Reservas registradas</p>
+                <div class="text-center mt-3">
+                    <a href="{% url 'financeiro:relatorios' %}" class="btn btn-outline-primary">Ver Relatórios</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Alertas Recentes -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-bell"></i> Alertas Recentes
+            </div>
+            <div class="card-body">
+                {% if alertas %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Prioridade</th>
+                                <th>Título</th>
+                                <th>Data</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alerta in alertas %}
+                            <tr class="{% if alerta.prioridade == 'urgente' %}table-danger{% elif alerta.prioridade == 'alta' %}table-warning{% endif %}">
+                                <td>
+                                    {% if alerta.prioridade == 'urgente' %}
+                                    <span class="badge bg-danger">Urgente</span>
+                                    {% elif alerta.prioridade == 'alta' %}
+                                    <span class="badge bg-warning text-dark">Alta</span>
+                                    {% elif alerta.prioridade == 'media' %}
+                                    <span class="badge bg-info">Média</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Baixa</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ alerta.titulo }}</td>
+                                <td>{{ alerta.data_criacao|date:"d/m/Y" }}</td>
+                                <td>
+                                    <a href="{% url 'financeiro:alerta_detalhe' alerta.id %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                    <a href="{% url 'financeiro:alerta_resolver' alerta.id %}" class="btn btn-sm btn-outline-success">Resolver</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center">Não há alertas pendentes.</p>
+                {% endif %}
+                <div class="text-center mt-3">
+                    <a href="{% url 'financeiro:alertas' %}" class="btn btn-outline-primary">Ver Todos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Próximos Pagamentos e Despesas -->
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-calendar-day"></i> Próximos Pagamentos Pendentes
+            </div>
+            <div class="card-body">
+                {% if proximos_pagamentos %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Reserva</th>
+                                <th>Valor</th>
+                                <th>Data</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pagamento in proximos_pagamentos %}
+                            <tr>
+                                <td>{{ pagamento.reserva.codigo }}</td>
+                                <td>R$ {{ pagamento.valor|floatformat:2 }}</td>
+                                <td>{{ pagamento.data_pagamento|date:"d/m/Y" }}</td>
+                                <td>
+                                    <a href="{% url 'financeiro:pagamento_detalhe' pagamento.id %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center">Não há pagamentos pendentes.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-calendar-day"></i> Próximas Despesas a Vencer
+            </div>
+            <div class="card-body">
+                {% if proximas_despesas %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th>Vencimento</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for despesa in proximas_despesas %}
+                            <tr>
+                                <td>{{ despesa.descricao }}</td>
+                                <td>R$ {{ despesa.valor|floatformat:2 }}</td>
+                                <td>{{ despesa.data_vencimento|date:"d/m/Y" }}</td>
+                                <td>
+                                    <a href="{% url 'financeiro:despesa_detalhe' despesa.id %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center">Não há despesas pendentes.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block financeiro_js %}
+<script>
+    // Gráfico de Receitas x Despesas
+    var ctx = document.getElementById('financialChart').getContext('2d');
+    
+    var financialChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ categorias_meses|safe }},
+            datasets: [{
+                label: 'Receitas',
+                data: {{ dados_receitas|safe }},
+                borderColor: '#34c38f',
+                backgroundColor: 'rgba(52, 195, 143, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }, {
+                label: 'Despesas',
+                data: {{ dados_despesas|safe }},
+                borderColor: '#f46a6a',
+                backgroundColor: 'rgba(244, 106, 106, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return 'R$ ' + value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': R$ ' + context.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %} 

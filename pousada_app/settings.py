@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from django.contrib.messages import constants as messages
 
 # Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -25,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-g$9=n!wx$76(rp!@=4h2ugr-_ew)p@as*5&21)v((0rw=%oryk')
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-j_l#41qk%y7)8)w0y^jxn=n2&80@7-#-vd-)k*qqh!ykz3)mp#')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
@@ -58,6 +59,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Ativando o middleware de alertas
+    'financeiro.middleware.AlertasMiddleware',
 ]
 
 ROOT_URLCONF = 'pousada_app.urls'
@@ -124,15 +127,14 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'pousada_app', 'static'),
-]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'pousada_app', 'static')]
 
-MEDIA_URL = '/media/'
+# Media files
+MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
@@ -140,7 +142,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configuração de Logging
+# Configurações de mensagens do Django
+MESSAGE_TAGS = {
+    messages.DEBUG: 'secondary',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'danger',
+}
+
+# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -158,11 +169,11 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'pousada.log'),
+            'filename': os.path.join(BASE_DIR, 'logs', 'pousada.log'),
             'formatter': 'verbose',
         },
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
@@ -182,12 +193,12 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'hospedes': {
+        'reservas': {
             'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': False,
         },
-        'reservas': {
+        'hospedes': {
             'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': False,
@@ -204,3 +215,9 @@ LOGGING = {
         },
     },
 }
+
+# Criar diretório de logs se não existir
+os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
+
+# Login URL
+LOGIN_URL = '/admin/login/'

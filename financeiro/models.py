@@ -79,11 +79,20 @@ class Despesa(models.Model):
         ('outros', 'Outros'),
     ]
     
+    STATUS_CHOICES = [
+        ('pago', 'Pago'),
+        ('pendente', 'Pendente'),
+        ('atrasado', 'Atrasado'),
+        ('cancelado', 'Cancelado'),
+    ]
+    
     descricao = models.CharField(max_length=200)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
     categoria = models.CharField(max_length=20, choices=CATEGORIA_CHOICES)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pendente')
     
     data_despesa = models.DateField()
+    data_vencimento = models.DateField()
     data_pagamento = models.DateField(null=True, blank=True)
     
     comprovante = models.FileField(upload_to='despesas/', blank=True, null=True)
@@ -111,3 +120,122 @@ class Despesa(models.Model):
             logger.info(f'Nova despesa registrada: {self.descricao} - R$ {self.valor}')
         else:
             logger.info(f'Despesa atualizada: {self.id} - {self.descricao}')
+
+
+class Receita(models.Model):
+    """
+    Modelo para registro de receitas além das reservas (aluguel, freelas, etc).
+    """
+    CATEGORIA_CHOICES = [
+        ('aluguel', 'Aluguel de Ponto Comercial'),
+        ('freela', 'Serviços Freelancer'),
+        ('eventos', 'Eventos'),
+        ('produtos', 'Venda de Produtos'),
+        ('outros', 'Outros'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('recebido', 'Recebido'),
+        ('pendente', 'Pendente'),
+        ('atrasado', 'Atrasado'),
+        ('cancelado', 'Cancelado'),
+    ]
+    
+    descricao = models.CharField(max_length=200)
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+    categoria = models.CharField(max_length=20, choices=CATEGORIA_CHOICES)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pendente')
+    
+    data_receita = models.DateField()
+    data_recebimento = models.DateField(null=True, blank=True)
+    
+    comprovante = models.FileField(upload_to='receitas/', blank=True, null=True)
+    observacoes = models.TextField(blank=True, null=True)
+    recorrente = models.BooleanField(default=False, help_text='Se é uma receita recorrente (mensal)')
+    
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_atualizacao = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Receita'
+        verbose_name_plural = 'Receitas'
+        ordering = ['-data_receita']
+    
+    def __str__(self):
+        return f'Receita: {self.descricao} - R$ {self.valor}'
+    
+    def save(self, *args, **kwargs):
+        """
+        Sobrescreve o método save para registrar no log quando uma receita é criada ou atualizada.
+        """
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        
+        if is_new:
+            logger.info(f'Nova receita registrada: {self.descricao} - R$ {self.valor}')
+        else:
+            logger.info(f'Receita atualizada: {self.id} - {self.descricao}')
+
+
+class Alerta(models.Model):
+    """
+    Modelo para registro de alertas e notificações do sistema financeiro.
+    """
+    TIPO_CHOICES = [
+        ('reserva_pendente', 'Reserva com Pagamento Pendente'),
+        ('despesa_vencendo', 'Despesa Próxima do Vencimento'),
+        ('receita_atrasada', 'Receita em Atraso'),
+        ('ocupacao_baixa', 'Baixa Ocupação'),
+        ('manutencao', 'Manutenção Necessária'),
+        ('estoque', 'Estoque Baixo'),
+        ('outros', 'Outros'),
+    ]
+    
+    PRIORIDADE_CHOICES = [
+        ('baixa', 'Baixa'),
+        ('media', 'Média'),
+        ('alta', 'Alta'),
+        ('urgente', 'Urgente'),
+    ]
+    
+    titulo = models.CharField(max_length=100)
+    mensagem = models.TextField()
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    prioridade = models.CharField(max_length=10, choices=PRIORIDADE_CHOICES, default='media')
+    
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_vencimento = models.DateField(null=True, blank=True)
+    
+    # Relacionamentos opcionais
+    reserva = models.ForeignKey('reservas.Reserva', on_delete=models.SET_NULL, null=True, blank=True, related_name='alertas')
+    despesa = models.ForeignKey(Despesa, on_delete=models.SET_NULL, null=True, blank=True, related_name='alertas')
+    receita = models.ForeignKey(Receita, on_delete=models.SET_NULL, null=True, blank=True, related_name='alertas')
+    
+    visualizado = models.BooleanField(default=False)
+    resolvido = models.BooleanField(default=False)
+    data_resolucao = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        verbose_name = 'Alerta'
+        verbose_name_plural = 'Alertas'
+        ordering = ['-prioridade', '-data_criacao']
+    
+    def __str__(self):
+        return f'Alerta: {self.titulo} - {self.get_prioridade_display()}'
+    
+    def marcar_como_resolvido(self):
+        """
+        Marca o alerta como resolvido e registra a data de resolução.
+        """
+        self.resolvido = True
+        self.data_resolucao = timezone.now()
+        self.save()
+        logger.info(f'Alerta {self.id} - {self.titulo} marcado como resolvido')
+    
+    def marcar_como_visualizado(self):
+        """
+        Marca o alerta como visualizado.
+        """
+        self.visualizado = True
+        self.save()
+        logger.info(f'Alerta {self.id} - {self.titulo} marcado como visualizado')

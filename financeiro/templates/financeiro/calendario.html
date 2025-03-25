@@ -1,0 +1,426 @@
+{% extends 'financeiro/base_financeiro.html' %}
+{% load static %}
+
+{% block page_title %}Calendário de Reservas{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{% url 'financeiro:dashboard' %}" class="btn btn-outline-secondary">Voltar para Dashboard</a>
+    <a href="{% url 'reservas:criar' %}" class="btn btn-primary">Nova Reserva</a>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.css" rel="stylesheet">
+<style>
+    #calendar {
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .fc-event {
+        cursor: pointer;
+    }
+    
+    .fc-toolbar-title {
+        font-size: 1.5rem !important;
+    }
+    
+    .fc-daygrid-day.fc-day-today {
+        background-color: rgba(52, 195, 143, 0.1) !important;
+    }
+    
+    .reservation-details {
+        font-size: 0.9rem;
+    }
+    
+    .reservation-details ul {
+        list-style: none;
+        padding-left: 0;
+    }
+    
+    .reservation-details ul li {
+        margin-bottom: 8px;
+        display: flex;
+    }
+    
+    .reservation-details ul li i {
+        width: 20px;
+        text-align: center;
+        margin-right: 10px;
+    }
+    
+    #reservationModal .modal-header {
+        border-radius: 0;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .status-pendente {
+        background-color: #f9c851;
+        color: #343a40;
+    }
+    
+    .status-confirmada {
+        background-color: #34c38f;
+        color: #fff;
+    }
+    
+    .status-cancelada {
+        background-color: #f46a6a;
+        color: #fff;
+    }
+    
+    .status-concluida {
+        background-color: #556ee6;
+        color: #fff;
+    }
+    
+    .status-no-show {
+        background-color: #74788d;
+        color: #fff;
+    }
+    
+    .legend {
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-right: 15px;
+    }
+    
+    .legend-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        margin-right: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block financeiro_content %}
+<div class="row">
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-body">
+                <div id="calendar"></div>
+                
+                <!-- Legenda do Calendário -->
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #f9c851;"></div>
+                        <span>Pendente</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #34c38f;"></div>
+                        <span>Confirmada</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #f46a6a;"></div>
+                        <span>Cancelada</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #556ee6;"></div>
+                        <span>Concluída</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #74788d;"></div>
+                        <span>No-Show</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-hotel"></i> Quartos
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for quarto in quartos %}
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center room-filter" data-room="{{ quarto.numero }}">
+                        {{ quarto.numero }} - {{ quarto.categoria.nome }}
+                        <span class="badge {% if quarto.status == 'disponivel' %}bg-success{% elif quarto.status == 'ocupado' %}bg-danger{% else %}bg-warning{% endif %} rounded-pill">
+                            {{ quarto.get_status_display }}
+                        </span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-filter"></i> Filtros
+            </div>
+            <div class="card-body">
+                <form id="calendarFilters">
+                    <div class="mb-3">
+                        <label class="form-label">Status da Reserva</label>
+                        <div class="form-check">
+                            <input class="form-check-input filter-status" type="checkbox" value="pendente" id="statusPendente" checked>
+                            <label class="form-check-label" for="statusPendente">
+                                Pendente
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-status" type="checkbox" value="confirmada" id="statusConfirmada" checked>
+                            <label class="form-check-label" for="statusConfirmada">
+                                Confirmada
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-status" type="checkbox" value="cancelada" id="statusCancelada" checked>
+                            <label class="form-check-label" for="statusCancelada">
+                                Cancelada
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-status" type="checkbox" value="concluida" id="statusConcluida" checked>
+                            <label class="form-check-label" for="statusConcluida">
+                                Concluída
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-status" type="checkbox" value="no_show" id="statusNoShow" checked>
+                            <label class="form-check-label" for="statusNoShow">
+                                No-Show
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="button" id="resetFilters" class="btn btn-outline-secondary">Limpar Filtros</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para detalhes da reserva -->
+<div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" id="modalHeader">
+                <h5 class="modal-title" id="reservationModalLabel">Detalhes da Reserva</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 id="reservationCode"></h5>
+                            <span id="reservationStatus" class="status-badge"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row reservation-details">
+                    <div class="col-md-6">
+                        <ul>
+                            <li><i class="fas fa-hotel"></i> <span id="reservationRoom"></span></li>
+                            <li><i class="fas fa-user"></i> <span id="reservationGuest"></span></li>
+                            <li><i class="fas fa-users"></i> <span id="reservationOccupancy"></span></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul>
+                            <li><i class="fas fa-calendar-check"></i> <span id="reservationCheckIn"></span></li>
+                            <li><i class="fas fa-calendar-times"></i> <span id="reservationCheckOut"></span></li>
+                            <li><i class="fas fa-money-bill-wave"></i> <span id="reservationValue"></span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="viewReservationLink" class="btn btn-primary">Ver Detalhes</a>
+                <a href="#" id="editStatusLink" class="btn btn-success">Atualizar Status</a>
+                <a href="#" id="addPaymentLink" class="btn btn-info">Registrar Pagamento</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block financeiro_js %}
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/locales/pt-br.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dados dos eventos (reservas)
+        var eventos = {{ eventos_json|safe }};
+        var filteredEvents = [...eventos];
+        
+        // Inicializa o calendário
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listMonth'
+            },
+            initialView: 'dayGridMonth',
+            locale: 'pt-br',
+            events: filteredEvents,
+            editable: false,
+            selectable: true,
+            selectMirror: true,
+            dayMaxEvents: true,
+            eventClick: function(info) {
+                showReservationDetails(info.event);
+            },
+            dateClick: function(info) {
+                // Redireciona para página de nova reserva com a data selecionada
+                window.location.href = "{% url 'reservas:criar' %}?check_in=" + info.dateStr;
+            }
+        });
+        
+        calendar.render();
+        
+        // Função para mostrar detalhes da reserva
+        function showReservationDetails(event) {
+            var props = event.extendedProps;
+            
+            // Configura o modal com as informações da reserva
+            document.getElementById('reservationCode').textContent = event.title;
+            document.getElementById('reservationRoom').textContent = 'Quarto ' + props.quarto;
+            document.getElementById('reservationGuest').textContent = props.hospede;
+            document.getElementById('reservationOccupancy').textContent = 'Adultos e crianças';
+            
+            // Formata as datas
+            var checkInDate = new Date(event.start);
+            var checkOutDate = new Date(event.end);
+            document.getElementById('reservationCheckIn').textContent = checkInDate.toLocaleDateString('pt-BR');
+            document.getElementById('reservationCheckOut').textContent = checkOutDate.toLocaleDateString('pt-BR');
+            
+            // Formata o valor
+            document.getElementById('reservationValue').textContent = 'R$ ' + props.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            // Configura o status
+            var statusElem = document.getElementById('reservationStatus');
+            statusElem.textContent = capitalizarPrimeiraLetra(props.status);
+            statusElem.className = 'status-badge status-' + props.status;
+            
+            // Configura os links de ação
+            var reservationId = event.id;
+            document.getElementById('viewReservationLink').href = '/reservas/detalhe/' + reservationId + '/';
+            document.getElementById('editStatusLink').href = '/reservas/editar/' + reservationId + '/';
+            document.getElementById('addPaymentLink').href = '{% url "financeiro:pagamento_novo" %}?reserva=' + reservationId;
+            
+            // Configura a cor do cabeçalho do modal
+            var modalHeader = document.getElementById('modalHeader');
+            modalHeader.style.backgroundColor = event.backgroundColor;
+            modalHeader.style.color = '#fff';
+            
+            // Abre o modal
+            var modal = new bootstrap.Modal(document.getElementById('reservationModal'));
+            modal.show();
+        }
+        
+        // Filtros do calendário
+        var roomFilters = document.querySelectorAll('.room-filter');
+        var statusFilters = document.querySelectorAll('.filter-status');
+        var resetFiltersBtn = document.getElementById('resetFilters');
+        
+        // Filtro por quarto
+        roomFilters.forEach(function(roomFilter) {
+            roomFilter.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove a classe active de todos os filtros de quarto
+                roomFilters.forEach(function(rf) {
+                    rf.classList.remove('active');
+                });
+                
+                // Adiciona a classe active ao filtro clicado
+                this.classList.add('active');
+                
+                // Filtra os eventos
+                filterEvents();
+            });
+        });
+        
+        // Filtro por status
+        statusFilters.forEach(function(statusFilter) {
+            statusFilter.addEventListener('change', function() {
+                filterEvents();
+            });
+        });
+        
+        // Botão para limpar filtros
+        resetFiltersBtn.addEventListener('click', function() {
+            // Desmarca o filtro de quartos
+            roomFilters.forEach(function(rf) {
+                rf.classList.remove('active');
+            });
+            
+            // Marca todos os filtros de status
+            statusFilters.forEach(function(sf) {
+                sf.checked = true;
+            });
+            
+            // Atualiza os eventos
+            filteredEvents = [...eventos];
+            calendar.removeAllEvents();
+            calendar.addEventSource(filteredEvents);
+        });
+        
+        // Função para filtrar eventos
+        function filterEvents() {
+            // Obtém o quarto selecionado (se houver)
+            var selectedRoom = null;
+            roomFilters.forEach(function(rf) {
+                if (rf.classList.contains('active')) {
+                    selectedRoom = rf.dataset.room;
+                }
+            });
+            
+            // Obtém os status selecionados
+            var selectedStatuses = [];
+            statusFilters.forEach(function(sf) {
+                if (sf.checked) {
+                    selectedStatuses.push(sf.value);
+                }
+            });
+            
+            // Filtra os eventos
+            filteredEvents = eventos.filter(function(event) {
+                var roomMatch = !selectedRoom || event.extendedProps.quarto === selectedRoom;
+                var statusMatch = selectedStatuses.includes(event.extendedProps.status);
+                
+                return roomMatch && statusMatch;
+            });
+            
+            // Atualiza o calendário
+            calendar.removeAllEvents();
+            calendar.addEventSource(filteredEvents);
+        }
+        
+        // Função auxiliar para capitalizar primeira letra
+        function capitalizarPrimeiraLetra(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+    });
+</script>
+{% endblock %} 

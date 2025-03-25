@@ -1,0 +1,167 @@
+{% extends 'financeiro/base_financeiro.html' %}
+{% load static %}
+
+{% block title %}Alerta: {{ alerta.titulo }} | Pousada Pajéu{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho da Página -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        Alerta: {{ alerta.titulo }}
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'financeiro:alertas' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar para Alertas
+            </a>
+            <a href="{% url 'financeiro:alerta_editar' alerta.pk %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            {% if not alerta.resolvido %}
+            <a href="{% url 'financeiro:alerta_resolver' alerta.pk %}" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-check-lg"></i> Marcar como Resolvido
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Detalhes do Alerta -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Informações do Alerta</h5>
+                <span>
+                    {% if alerta.prioridade == 'urgente' %}
+                        <span class="badge text-bg-danger">URGENTE</span>
+                    {% elif alerta.prioridade == 'alta' %}
+                        <span class="badge text-bg-warning">ALTA</span>
+                    {% elif alerta.prioridade == 'media' %}
+                        <span class="badge text-bg-info">MÉDIA</span>
+                    {% else %}
+                        <span class="badge text-bg-secondary">BAIXA</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">{{ alerta.titulo }}</h3>
+                <p class="card-text">{{ alerta.mensagem|linebreaks }}</p>
+                
+                <dl class="row">
+                    <dt class="col-sm-4">Tipo:</dt>
+                    <dd class="col-sm-8">{{ alerta.get_tipo_display }}</dd>
+                    
+                    <dt class="col-sm-4">Criado em:</dt>
+                    <dd class="col-sm-8">{{ alerta.data_criacao|date:"d/m/Y H:i" }}</dd>
+                    
+                    {% if alerta.data_vencimento %}
+                    <dt class="col-sm-4">Data de Vencimento:</dt>
+                    <dd class="col-sm-8">{{ alerta.data_vencimento|date:"d/m/Y" }}</dd>
+                    {% endif %}
+                    
+                    <dt class="col-sm-4">Status:</dt>
+                    <dd class="col-sm-8">
+                        {% if alerta.resolvido %}
+                            <span class="badge text-bg-success">Resolvido</span>
+                            {% if alerta.data_resolucao %}
+                                em {{ alerta.data_resolucao|date:"d/m/Y H:i" }}
+                            {% endif %}
+                        {% else %}
+                            <span class="badge text-bg-danger">Pendente</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-4">Visualizado:</dt>
+                    <dd class="col-sm-8">
+                        {% if alerta.visualizado %}
+                            <span class="badge text-bg-success">Sim</span>
+                        {% else %}
+                            <span class="badge text-bg-danger">Não</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        {% if alerta.reserva or alerta.despesa or alerta.receita %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Relacionamentos</h5>
+            </div>
+            <div class="card-body">
+                {% if alerta.reserva %}
+                <div class="mb-3">
+                    <h6 class="card-subtitle mb-2 text-muted">Reserva</h6>
+                    <p class="card-text">
+                        <strong>Código:</strong> {{ alerta.reserva.codigo }}<br>
+                        <strong>Hóspede:</strong> {{ alerta.reserva.hospede.nome }}<br>
+                        <strong>Período:</strong> {{ alerta.reserva.check_in|date:"d/m/Y" }} a {{ alerta.reserva.check_out|date:"d/m/Y" }}<br>
+                        <strong>Status:</strong> {{ alerta.reserva.get_status_display }}
+                    </p>
+                    <a href="{% url 'reservas:detalhe' alerta.reserva.pk %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i> Ver Reserva
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if alerta.despesa %}
+                <div class="mb-3">
+                    <h6 class="card-subtitle mb-2 text-muted">Despesa</h6>
+                    <p class="card-text">
+                        <strong>Descrição:</strong> {{ alerta.despesa.descricao }}<br>
+                        <strong>Valor:</strong> R$ {{ alerta.despesa.valor }}<br>
+                        <strong>Vencimento:</strong> {{ alerta.despesa.data_vencimento|date:"d/m/Y" }}<br>
+                        <strong>Status:</strong> {{ alerta.despesa.get_status_display }}
+                    </p>
+                    <a href="{% url 'financeiro:despesa_detalhe' alerta.despesa.pk %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i> Ver Despesa
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if alerta.receita %}
+                <div class="mb-3">
+                    <h6 class="card-subtitle mb-2 text-muted">Receita</h6>
+                    <p class="card-text">
+                        <strong>Descrição:</strong> {{ alerta.receita.descricao }}<br>
+                        <strong>Valor:</strong> R$ {{ alerta.receita.valor }}<br>
+                        <strong>Data:</strong> {{ alerta.receita.data_receita|date:"d/m/Y" }}<br>
+                        <strong>Status:</strong> {{ alerta.receita.get_status_display }}
+                    </p>
+                    <a href="{% url 'financeiro:receita_detalhe' alerta.receita.pk %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i> Ver Receita
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Ações</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'financeiro:alerta_editar' alerta.pk %}" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Editar Alerta
+                    </a>
+                    
+                    {% if not alerta.resolvido %}
+                    <a href="{% url 'financeiro:alerta_resolver' alerta.pk %}" class="btn btn-success">
+                        <i class="bi bi-check-lg"></i> Marcar como Resolvido
+                    </a>
+                    {% else %}
+                    <button class="btn btn-outline-secondary" disabled>
+                        <i class="bi bi-check-circle"></i> Alerta Resolvido
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
