@@ -1,0 +1,345 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Check-in Direto - Pousada Pajeú{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0 text-gray-800">Check-in Direto</h1>
+            <p class="text-muted">Realize o check-in de hóspedes sem reserva prévia</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Dados da Estadia</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'reservas:processar_check_in_direto' %}" id="formCheckInDireto">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label for="quarto" class="form-label">Quarto</label>
+                                <select class="form-select" id="quarto" name="quarto" required>
+                                    <option value="">Selecione um quarto</option>
+                                    {% for info in quartos_info %}
+                                    <option value="{{ info.quarto.id }}" 
+                                            data-preco="{{ info.quarto.preco_diaria }}"
+                                            data-categoria="{{ info.quarto.categoria.nome }}"
+                                            data-capacidade="{{ info.quarto.capacidade }}"
+                                            data-disponivel="true"
+                                            data-ocupado="{{ info.ocupado|lower }}"
+                                            {% if info.ocupado %}
+                                            data-checkout="{{ info.proxima_disponibilidade|date:'Y-m-d' }}"
+                                            {% endif %}>
+                                        Quarto {{ info.quarto.numero }} - {{ info.quarto.categoria.nome }}
+                                        {% if info.ocupado %}
+                                        (Ocupado até {{ info.proxima_disponibilidade|date:'d/m/Y' }})
+                                        {% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div id="quartoInfo" class="mt-2 small text-muted"></div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="check_in" class="form-label">Data de Check-in</label>
+                                <input type="date" class="form-control" id="check_in" name="check_in" 
+                                       value="{{ hoje|date:'Y-m-d' }}" required>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="check_out" class="form-label">Data de Check-out</label>
+                                <input type="date" class="form-control" id="check_out" name="check_out" 
+                                       value="{{ amanha|date:'Y-m-d' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label for="hora_checkin" class="form-label">Hora de Chegada</label>
+                                <input type="time" class="form-control" id="hora_checkin" name="hora_checkin" 
+                                       value="{{ hora_atual|time:'H:i' }}" required>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="adultos" class="form-label">Adultos</label>
+                                <input type="number" class="form-control" id="adultos" name="adultos" 
+                                       value="1" min="1" max="10" required>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="criancas" class="form-label">Crianças</label>
+                                <input type="number" class="form-control" id="criancas" name="criancas" 
+                                       value="0" min="0" max="10">
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="nome" class="form-label">Nome do Hóspede</label>
+                                <input type="text" class="form-control" id="nome" name="nome" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="cpf" class="form-label">CPF</label>
+                                <input type="text" class="form-control" id="cpf" name="cpf" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label for="data_nascimento" class="form-label">Data de Nascimento</label>
+                                <input type="date" class="form-control" id="data_nascimento" name="data_nascimento" required>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="email" class="form-label">E-mail</label>
+                                <input type="email" class="form-control" id="email" name="email">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="telefone" class="form-label">Telefone</label>
+                                <input type="tel" class="form-control" id="telefone" name="telefone" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <label for="valor_diaria" class="form-label">Valor da Diária</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="text" class="form-control" id="valor_diaria" name="valor_diaria" 
+                                           value="0.00" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="desconto_diaria" class="form-label">Desconto por Diária</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="text" class="form-control" id="desconto_diaria" name="desconto_diaria" 
+                                           value="0.00">
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="forma_pagamento" class="form-label">Forma de Pagamento</label>
+                                <select class="form-select" id="forma_pagamento" name="forma_pagamento" required>
+                                    <option value="">Selecione</option>
+                                    <option value="dinheiro">Dinheiro</option>
+                                    <option value="cartao_credito">Cartão de Crédito</option>
+                                    <option value="cartao_debito">Cartão de Débito</option>
+                                    <option value="pix">PIX</option>
+                                    <option value="transferencia">Transferência Bancária</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="valor_pago" class="form-label">Valor Total</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="text" class="form-control" id="valor_pago" name="valor_pago" 
+                                           value="0.00" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="observacoes" class="form-label">Observações</label>
+                            <textarea class="form-control" id="observacoes" name="observacoes" rows="3"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'reservas:check_in' %}" class="btn btn-secondary me-2">Cancelar</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check-circle"></i> Confirmar Check-in
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const quartoSelect = document.getElementById('quarto');
+    const valorDiariaInput = document.getElementById('valor_diaria');
+    const descontoDiariaInput = document.getElementById('desconto_diaria');
+    const valorPagoInput = document.getElementById('valor_pago');
+    const checkInInput = document.getElementById('check_in');
+    const checkOutInput = document.getElementById('check_out');
+    const adultosInput = document.getElementById('adultos');
+    const criancasInput = document.getElementById('criancas');
+    const quartoInfo = document.getElementById('quartoInfo');
+    const formCheckIn = document.getElementById('formCheckInDireto');
+
+    // Função para calcular o valor da diária com base no número de pessoas
+    function calcularValorDiaria() {
+        // Valor base para 1-2 pessoas
+        const valorBase = 140.00;
+        
+        // Total de pessoas
+        const totalPessoas = parseInt(adultosInput.value || 0) + parseInt(criancasInput.value || 0);
+        
+        // Pessoas extras (além de 2)
+        const pessoasExtras = Math.max(0, totalPessoas - 2);
+        
+        // Cálculo: R$140 + R$70 por pessoa adicional
+        return valorBase + (pessoasExtras * 70.00);
+    }
+
+    // Função para verificar a disponibilidade dos quartos de acordo com a data
+    function verificarDisponibilidadeQuartos() {
+        const checkInDate = new Date(checkInInput.value);
+        const checkOutDate = new Date(checkOutInput.value);
+        
+        // Percorre todas as opções do select
+        for (let i = 0; i < quartoSelect.options.length; i++) {
+            const option = quartoSelect.options[i];
+            if (!option.value) continue; // Pula a opção "Selecione um quarto"
+            
+            const ocupado = option.dataset.ocupado === 'true';
+            const checkOutQuarto = ocupado ? new Date(option.dataset.checkout) : null;
+            
+            // Se o quarto está ocupado, verifica se estará disponível na data desejada
+            if (ocupado) {
+                // Verifica se o check-in desejado é após o check-out do quarto
+                if (checkInDate >= checkOutQuarto) {
+                    // Quarto estará disponível na data desejada
+                    option.disabled = false;
+                    option.textContent = option.textContent.replace(/ \(Ocupado.*\)/, '');
+                } else {
+                    // Quarto não estará disponível na data desejada
+                    option.disabled = true;
+                }
+            } else {
+                // Quarto está disponível
+                option.disabled = false;
+            }
+        }
+        
+        // Verifica se o quarto selecionado está disponível para as novas datas
+        const selectedOption = quartoSelect.selectedOptions[0];
+        if (selectedOption && selectedOption.disabled) {
+            quartoSelect.value = ''; // Limpa a seleção se o quarto não estiver disponível
+            atualizarInfoQuarto();
+        }
+    }
+
+    // Função para atualizar informações do quarto
+    function atualizarInfoQuarto() {
+        const option = quartoSelect.selectedOptions[0];
+        if (option && option.value) {
+            const categoria = option.dataset.categoria;
+            const capacidade = option.dataset.capacidade;
+            const ocupado = option.dataset.ocupado === 'true';
+            const checkOutData = ocupado ? new Date(option.dataset.checkout) : null;
+            const checkInDate = new Date(checkInInput.value);
+            
+            // Calcula o valor da diária com base na ocupação
+            const valorDiariaCalculado = calcularValorDiaria();
+            valorDiariaInput.value = valorDiariaCalculado.toFixed(2);
+            
+            let info = `Categoria: ${categoria}<br>Capacidade: ${capacidade} pessoas<br>`;
+            
+            // Verifica se o quarto está ocupado e se o check-in é antes do check-out atual
+            if (ocupado && checkInDate < checkOutData) {
+                info += `<span class="text-danger">Ocupado até ${checkOutData.toLocaleDateString('pt-BR')}</span>`;
+            } else {
+                info += '<span class="text-success">Disponível para as datas selecionadas</span>';
+            }
+            
+            quartoInfo.innerHTML = info;
+        } else {
+            valorDiariaInput.value = '0.00';
+            quartoInfo.innerHTML = '';
+        }
+        calcularValorTotal();
+    }
+
+    // Função para calcular valor total
+    function calcularValorTotal() {
+        // Obtém o valor da diária e o desconto
+        const valorDiariaStr = valorDiariaInput.value.replace(',', '.').trim();
+        const valorDiaria = parseFloat(valorDiariaStr) || 0;
+        
+        const descontoDiariaStr = descontoDiariaInput.value.replace(',', '.').trim();
+        const descontoDiaria = parseFloat(descontoDiariaStr) || 0;
+        
+        // Valor da diária com desconto (não pode ser menor que R$100)
+        const valorDiariaComDesconto = Math.max(100, valorDiaria - descontoDiaria);
+        
+        // Calcula o número de dias
+        const checkIn = new Date(checkInInput.value);
+        const checkOut = new Date(checkOutInput.value);
+        const diffTime = Math.abs(checkOut - checkIn);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays > 0 && valorDiariaComDesconto > 0) {
+            const valorTotal = valorDiariaComDesconto * diffDays;
+            valorPagoInput.value = valorTotal.toFixed(2);
+        } else {
+            valorPagoInput.value = "0.00";
+        }
+    }
+
+    // Event listeners
+    quartoSelect.addEventListener('change', atualizarInfoQuarto);
+    
+    checkInInput.addEventListener('change', function() {
+        verificarDisponibilidadeQuartos();
+        calcularValorTotal();
+    });
+    
+    checkOutInput.addEventListener('change', function() {
+        verificarDisponibilidadeQuartos();
+        calcularValorTotal();
+    });
+    
+    adultosInput.addEventListener('change', function() {
+        atualizarInfoQuarto();
+    });
+    
+    criancasInput.addEventListener('change', function() {
+        atualizarInfoQuarto();
+    });
+    
+    descontoDiariaInput.addEventListener('input', calcularValorTotal);
+    
+    // Inicializa os valores
+    verificarDisponibilidadeQuartos();
+    atualizarInfoQuarto();
+
+    // Validação do formulário antes de enviar
+    formCheckIn.addEventListener('submit', function(e) {
+        // Garante que valor_diaria e valor_pago tenham pelo menos um valor mínimo
+        if (!valorDiariaInput.value || isNaN(parseFloat(valorDiariaInput.value.replace(',', '.')))) {
+            valorDiariaInput.value = '0.00';
+        }
+        
+        if (!descontoDiariaInput.value || isNaN(parseFloat(descontoDiariaInput.value.replace(',', '.')))) {
+            descontoDiariaInput.value = '0.00';
+        }
+        
+        if (!valorPagoInput.value || isNaN(parseFloat(valorPagoInput.value.replace(',', '.')))) {
+            valorPagoInput.value = '0.00';
+        }
+        
+        // Converte valores para formato correto se o usuário usou vírgula
+        valorDiariaInput.value = parseFloat(valorDiariaInput.value.replace(',', '.')).toFixed(2);
+        descontoDiariaInput.value = parseFloat(descontoDiariaInput.value.replace(',', '.')).toFixed(2);
+        valorPagoInput.value = parseFloat(valorPagoInput.value.replace(',', '.')).toFixed(2);
+    });
+});
+</script>
+{% endblock %} 

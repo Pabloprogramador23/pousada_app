@@ -18,6 +18,7 @@ class Reserva(models.Model):
     STATUS_CHOICES = [
         ('pendente', 'Pendente'),
         ('confirmada', 'Confirmada'),
+        ('em_andamento', 'Em Andamento'),
         ('cancelada', 'Cancelada'),
         ('concluida', 'Concluída'),
         ('no_show', 'No-Show'),
@@ -58,6 +59,7 @@ class Reserva(models.Model):
     valor_diaria = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     valor_total = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     valor_sinal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    desconto_diaria = models.DecimalField("Desconto por diária", max_digits=10, decimal_places=2, default=0)
     
     # Comentários e solicitações
     observacoes = models.TextField(blank=True, null=True, verbose_name="Observações")
@@ -84,60 +86,86 @@ class Reserva(models.Model):
     def __str__(self):
         return f'Reserva {self.codigo} - {self.hospede.nome}'
     
+    @property
+    def status_badge(self):
+        """
+        Retorna a classe de cor do Bootstrap para o status atual.
+        """
+        status_colors = {
+            'pendente': 'secondary',
+            'confirmada': 'primary',
+            'em_andamento': 'info',
+            'concluida': 'success',
+            'cancelada': 'danger',
+            'no_show': 'warning'
+        }
+        return status_colors.get(self.status, 'secondary')
+    
     def clean(self):
         """
-        Valida que a data de check-in é anterior à data de check-out.
+        Valida que a data de check-in é anterior à data de check-out
+        e que não há sobreposição de reservas para o mesmo quarto.
         """
         if self.check_in and self.check_out:
             if self.check_in >= self.check_out:
                 raise ValidationError('A data de check-in deve ser anterior à data de check-out.')
             
             # Verifica sobreposição de reservas para o mesmo quarto
+            # Uma reserva se sobrepõe se:
+            # 1. Começa antes do check-out desta reserva E
+            # 2. Termina depois do check-in desta reserva E
+            # 3. Não é esta mesma reserva (em caso de atualização) E
+            # 4. Não está cancelada
             reservas_sobrepostas = Reserva.objects.filter(
                 quarto=self.quarto,
                 check_in__lt=self.check_out,
-                check_out__gt=self.check_in
+                check_out__gt=self.check_in,
+                status__in=['pendente', 'confirmada', 'em_andamento']
             ).exclude(pk=self.pk)
             
             if reservas_sobrepostas.exists():
-                raise ValidationError('Já existe uma reserva para este quarto no período selecionado.')
+                reserva_conflitante = reservas_sobrepostas.first()
+                raise ValidationError(
+                    f'Já existe uma reserva para este quarto no período selecionado. '
+                    f'Reserva conflitante: {reserva_conflitante.codigo} '
+                    f'({reserva_conflitante.hospede.nome}) - '
+                    f'Check-in: {reserva_conflitante.check_in.strftime("%d/%m/%Y")}, '
+                    f'Check-out: {reserva_conflitante.check_out.strftime("%d/%m/%Y")}'
+                )
     
     def calcular_total(self):
         """
-        Calcula o valor total da reserva, multiplicando o valor da diária pelo número de dias.
-        
-        O cálculo é feito considerando o sistema de diárias de 24h (meio-dia a meio-dia),
-        onde cada diária começa a contar a partir do horário de entrada do hóspede.
+        Calcula o valor total da reserva com base na diária, número de pessoas e período.
         """
-        if not self.check_in or not self.check_out:
+        # Primeiro calcula o número de dias
+        delta = (self.check_out - self.check_in).days
+        
+        # Se não há dias válidos, retorna zero
+        if delta <= 0:
             return 0
-            
-        # Verifica se check_in e check_out são datetime ou só date
-        if isinstance(self.check_in, datetime) and isinstance(self.check_out, datetime):
-            # Se já temos datetime com horas
-            delta = self.check_out - self.check_in
-        else:
-            # Se temos apenas datas, considera meio-dia a meio-dia
-            # Converte para datetime com hora padrão de check-in às 14h
-            check_in_datetime = datetime.combine(self.check_in, time(14, 0))
-            check_out_datetime = datetime.combine(self.check_out, time(12, 0))
-            delta = check_out_datetime - check_in_datetime
-            
-        # Calcula número de diárias (arredondando para cima qualquer fração de hora)
-        total_horas = delta.total_seconds() / 3600
-        total_diarias = math.ceil(total_horas / 24)
         
-        # O valor por pessoa é de R$ 70,00
-        valor_por_pessoa = 70
+        # Calcula o valor da diária com base no número de pessoas
+        valor_base = 140.00  # Valor base para 1-2 pessoas
         
-        # O valor mínimo do quarto é de R$ 140,00 (mesmo com 1 pessoa)
-        valor_minimo_quarto = 140
+        # Número total de pessoas
+        total_pessoas = self.adultos + self.criancas
         
-        # Calcula valor baseado no número de pessoas
-        valor_por_diaria = max(valor_minimo_quarto, (self.adultos + self.criancas) * valor_por_pessoa)
+        # Adiciona R$70 por pessoa adicional além de 2
+        pessoas_extras = max(0, total_pessoas - 2)
+        valor_diaria_calculado = valor_base + (pessoas_extras * 70.00)
         
-        # Valor total é o valor da diária multiplicado pelo número de diárias
-        return valor_por_diaria * total_diarias
+        # Aplica desconto se houver
+        if hasattr(self, 'desconto_diaria') and self.desconto_diaria:
+            valor_diaria_calculado -= self.desconto_diaria
+        
+        # Garante que a diária não seja menor que o mínimo
+        valor_diaria_calculado = max(valor_diaria_calculado, 100.00)
+        
+        # Atualiza o valor da diária
+        self.valor_diaria = valor_diaria_calculado
+        
+        # Calcula o total
+        return valor_diaria_calculado * delta
     
     def save(self, *args, **kwargs):
         """
@@ -145,11 +173,13 @@ class Reserva(models.Model):
         """
         # Calcula o valor total da reserva
         if not self.valor_total or self.valor_total == 0:
-            self.valor_diaria = max(140, (self.adultos + self.criancas) * 70)
             self.valor_total = self.calcular_total()
             
         # Atualiza os flags baseado no status
         if self.status == 'confirmada':
+            self.confirmada = True
+            self.cancelada = False
+        elif self.status == 'em_andamento':
             self.confirmada = True
             self.cancelada = False
         elif self.status == 'cancelada':
@@ -180,6 +210,20 @@ class Reserva(models.Model):
                 logger.info(f'Reserva cancelada: {self.codigo}')
                 
             logger.info(f'Reserva atualizada: {self.codigo}')
+
+    def get_status_color(self):
+        """
+        Retorna a cor correspondente ao status da reserva.
+        """
+        cores = {
+            'pendente': '#f9c851',  # Amarelo
+            'confirmada': '#34c38f', # Verde
+            'em_andamento': '#556ee6', # Azul
+            'concluida': '#50a5f1',  # Azul claro
+            'cancelada': '#f46a6a',  # Vermelho
+            'no_show': '#74788d'     # Cinza
+        }
+        return cores.get(self.status, '#74788d')
 
 
 class Historico(models.Model):

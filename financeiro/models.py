@@ -127,6 +127,7 @@ class Receita(models.Model):
     Modelo para registro de receitas além das reservas (aluguel, freelas, etc).
     """
     CATEGORIA_CHOICES = [
+        ('hospedagem', 'Hospedagem'),
         ('aluguel', 'Aluguel de Ponto Comercial'),
         ('freela', 'Serviços Freelancer'),
         ('eventos', 'Eventos'),

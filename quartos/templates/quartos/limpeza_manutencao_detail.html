@@ -1,0 +1,271 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Detalhes da Tarefa - Pousada Pajeú{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Detalhes da Tarefa</h1>
+            <p class="text-muted">{{ tarefa.get_tipo_display }} do {{ tarefa.quarto }}</p>
+        </div>
+        <div>
+            <a href="{% url 'quartos:limpeza_manutencao_list' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+            <a href="{% url 'quartos:limpeza_manutencao_update' pk=tarefa.pk %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+        </div>
+    </div>
+
+    <!-- Status e ações -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">Status e Ações</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>Status Atual: 
+                                {% if tarefa.status == 'agendada' %}
+                                <span class="badge bg-warning">{{ tarefa.get_status_display }}</span>
+                                {% elif tarefa.status == 'em_andamento' %}
+                                <span class="badge bg-info">{{ tarefa.get_status_display }}</span>
+                                {% elif tarefa.status == 'concluida' %}
+                                <span class="badge bg-success">{{ tarefa.get_status_display }}</span>
+                                {% elif tarefa.status == 'cancelada' %}
+                                <span class="badge bg-secondary">{{ tarefa.get_status_display }}</span>
+                                {% endif %}
+                            </h5>
+                            <p>Prioridade: 
+                                {% if tarefa.prioridade == 'baixa' %}
+                                <span class="badge bg-success">{{ tarefa.get_prioridade_display }}</span>
+                                {% elif tarefa.prioridade == 'media' %}
+                                <span class="badge bg-info">{{ tarefa.get_prioridade_display }}</span>
+                                {% elif tarefa.prioridade == 'alta' %}
+                                <span class="badge bg-warning">{{ tarefa.get_prioridade_display }}</span>
+                                {% elif tarefa.prioridade == 'urgente' %}
+                                <span class="badge bg-danger">{{ tarefa.get_prioridade_display }}</span>
+                                {% endif %}
+                            </p>
+                            {% if tempo_decorrido %}
+                            <p>Tempo decorrido: <span class="badge bg-secondary">{{ tempo_decorrido }} minutos</span></p>
+                            {% elif tempo_ate_agendamento %}
+                            <p>Tempo até o agendamento: <span class="badge bg-secondary">{{ tempo_ate_agendamento }} minutos</span></p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if tarefa.status == 'agendada' %}
+                            <a href="{% url 'quartos:iniciar_tarefa' pk=tarefa.pk %}" class="btn btn-warning">
+                                <i class="fas fa-play-circle"></i> Iniciar Tarefa
+                            </a>
+                            {% elif tarefa.status == 'em_andamento' %}
+                            <a href="{% url 'quartos:concluir_tarefa' pk=tarefa.pk %}" class="btn btn-success">
+                                <i class="fas fa-check-circle"></i> Concluir Tarefa
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalhes da tarefa -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Informações da Tarefa</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">ID:</div>
+                        <div class="col-md-8">{{ tarefa.id }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Quarto:</div>
+                        <div class="col-md-8">{{ tarefa.quarto.numero }} ({{ tarefa.quarto.categoria.nome }})</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Tipo:</div>
+                        <div class="col-md-8">{{ tarefa.get_tipo_display }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Descrição:</div>
+                        <div class="col-md-8">{{ tarefa.descricao }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Responsável:</div>
+                        <div class="col-md-8">{{ tarefa.responsavel }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Tempo Estimado:</div>
+                        <div class="col-md-8">{{ tarefa.tempo_estimado }} minutos</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Custo:</div>
+                        <div class="col-md-8">R$ {{ tarefa.custo }}</div>
+                    </div>
+                    {% if tarefa.observacoes %}
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Observações:</div>
+                        <div class="col-md-8">{{ tarefa.observacoes }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Datas e Controle</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Data de Agendamento:</div>
+                        <div class="col-md-8">{{ tarefa.data_agendamento|date:"d/m/Y H:i" }}</div>
+                    </div>
+                    {% if tarefa.data_inicio %}
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Data de Início:</div>
+                        <div class="col-md-8">{{ tarefa.data_inicio|date:"d/m/Y H:i" }}</div>
+                    </div>
+                    {% endif %}
+                    {% if tarefa.data_conclusao %}
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Data de Conclusão:</div>
+                        <div class="col-md-8">{{ tarefa.data_conclusao|date:"d/m/Y H:i" }}</div>
+                    </div>
+                    {% endif %}
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Checklist Completo:</div>
+                        <div class="col-md-8">
+                            {% if tarefa.checklist_completo %}
+                            <span class="badge bg-success">Sim</span>
+                            {% else %}
+                            <span class="badge bg-danger">Não</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Aprovado:</div>
+                        <div class="col-md-8">
+                            {% if tarefa.aprovado %}
+                            <span class="badge bg-success">Sim</span>
+                            {% else %}
+                            <span class="badge bg-danger">Não</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Data de Criação:</div>
+                        <div class="col-md-8">{{ tarefa.data_criacao|date:"d/m/Y H:i" }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Última Atualização:</div>
+                        <div class="col-md-8">{{ tarefa.data_atualizacao|date:"d/m/Y H:i" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checklist -->
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Checklist</h6>
+                    <div>
+                        {% if tarefa.status == 'em_andamento' %}
+                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addItemModal">
+                            <i class="fas fa-plus-circle"></i> Adicionar Item
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'quartos:atualizar_checklist' pk=tarefa.pk %}">
+                        {% csrf_token %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Status</th>
+                                        <th>Observação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in itens_checklist %}
+                                    <tr>
+                                        <td>{{ item.item }}</td>
+                                        <td>
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="concluido_{{ item.pk }}" name="concluido_{{ item.pk }}" {% if item.concluido %}checked{% endif %} {% if tarefa.status != 'em_andamento' %}disabled{% endif %}>
+                                                <label class="custom-control-label" for="concluido_{{ item.pk }}">
+                                                    {% if item.concluido %}
+                                                    <span class="text-success">Concluído</span>
+                                                    {% else %}
+                                                    <span class="text-danger">Pendente</span>
+                                                    {% endif %}
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control form-control-sm" name="observacao_{{ item.pk }}" value="{{ item.observacao|default:'' }}" {% if tarefa.status != 'em_andamento' %}readonly{% endif %}>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="3" class="text-center">Não há itens no checklist.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if tarefa.status == 'em_andamento' and itens_checklist %}
+                        <button type="submit" class="btn btn-primary mt-3">
+                            <i class="fas fa-save"></i> Salvar Alterações
+                        </button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para adicionar novo item ao checklist -->
+<div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addItemModalLabel">Adicionar Item ao Checklist</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="{% url 'quartos:atualizar_checklist' pk=tarefa.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="novo_item">Descrição do Item:</label>
+                        <input type="text" class="form-control" id="novo_item" name="novo_item" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

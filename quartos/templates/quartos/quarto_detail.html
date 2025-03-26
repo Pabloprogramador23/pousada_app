@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Quarto {{ quarto.numero }} - Pousada Pajeú{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Quarto {{ quarto.numero }}</h1>
+            <p class="text-muted">{{ quarto.categoria.nome }} - {{ quarto.get_andar_display }}</p>
+        </div>
+        <div>
+            <a href="{% url 'quartos:quarto_list' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+            <a href="{% url 'quartos:limpeza_manutencao_create' %}?quarto={{ quarto.id }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus-circle"></i> Nova Tarefa
+            </a>
+        </div>
+    </div>
+
+    <!-- Status e ações -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Status do Quarto</h6>
+                    <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#descontoModal">
+                        <i class="fas fa-percentage"></i> Aplicar Desconto
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-left-primary h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Status</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                {% if quarto.status == 'disponivel' %}
+                                                <span class="badge bg-success">{{ quarto.get_status_display }}</span>
+                                                {% elif quarto.status == 'ocupado' %}
+                                                <span class="badge bg-danger">{{ quarto.get_status_display }}</span>
+                                                {% elif quarto.status == 'reservado' %}
+                                                <span class="badge bg-warning">{{ quarto.get_status_display }}</span>
+                                                {% elif quarto.status == 'limpeza' %}
+                                                <span class="badge bg-info">{{ quarto.get_status_display }}</span>
+                                                {% elif quarto.status == 'manutencao' %}
+                                                <span class="badge bg-secondary">{{ quarto.get_status_display }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-info-circle fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-left-success h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Diária Normal</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">R$ {{ quarto.preco_diaria }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-left-warning h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Desconto</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ quarto.desconto_porcentagem }}%</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-percentage fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-left-info h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Preço Final</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">R$ {{ quarto.preco_com_desconto }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-tags fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalhes do quarto -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Informações do Quarto</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Número:</div>
+                        <div class="col-md-8">{{ quarto.numero }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Categoria:</div>
+                        <div class="col-md-8">{{ quarto.categoria.nome }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Andar:</div>
+                        <div class="col-md-8">{{ quarto.get_andar_display }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Área:</div>
+                        <div class="col-md-8">{{ quarto.area }} m²</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Capacidade:</div>
+                        <div class="col-md-8">{{ quarto.categoria.capacidade }} pessoas</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Comodidades:</div>
+                        <div class="col-md-8">
+                            <ul class="list-unstyled">
+                                {% if quarto.possui_ar_condicionado %}<li><i class="fas fa-snowflake text-success"></i> Ar Condicionado</li>{% endif %}
+                                {% if quarto.possui_tv %}<li><i class="fas fa-tv text-success"></i> TV</li>{% endif %}
+                                {% if quarto.possui_frigobar %}<li><i class="fas fa-cube text-success"></i> Frigobar</li>{% endif %}
+                                {% if quarto.possui_cofre %}<li><i class="fas fa-lock text-success"></i> Cofre</li>{% endif %}
+                                {% if quarto.possui_varanda %}<li><i class="fas fa-door-open text-success"></i> Varanda</li>{% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% if quarto.observacoes %}
+                    <div class="row mb-3">
+                        <div class="col-md-4 font-weight-bold">Observações:</div>
+                        <div class="col-md-8">{{ quarto.observacoes }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Limpeza e Manutenção</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-5 font-weight-bold">Última Limpeza:</div>
+                        <div class="col-md-7">
+                            {% if quarto.ultima_limpeza %}
+                                {{ quarto.ultima_limpeza|date:"d/m/Y H:i" }}
+                                {% if dias_ultima_limpeza %}
+                                    (há {{ dias_ultima_limpeza }} dias)
+                                    {% if dias_ultima_limpeza > 3 %}
+                                        <span class="badge bg-danger">Atenção</span>
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <span class="text-danger">Não registrada</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-5 font-weight-bold">Próxima Manutenção:</div>
+                        <div class="col-md-7">
+                            {% if quarto.proxima_manutencao %}
+                                {{ quarto.proxima_manutencao|date:"d/m/Y" }}
+                            {% else %}
+                                <span class="text-muted">Não agendada</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <hr>
+                            <h6 class="font-weight-bold">Histórico de Atividades</h6>
+                            <div class="table-responsive mt-3">
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Tipo</th>
+                                            <th>Data</th>
+                                            <th>Status</th>
+                                            <th>Responsável</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for tarefa in tarefas %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'quartos:limpeza_manutencao_detail' pk=tarefa.pk %}">
+                                                    {{ tarefa.get_tipo_display }}
+                                                </a>
+                                            </td>
+                                            <td>{{ tarefa.data_agendamento|date:"d/m/Y" }}</td>
+                                            <td>
+                                                {% if tarefa.status == 'agendada' %}
+                                                <span class="badge bg-warning">{{ tarefa.get_status_display }}</span>
+                                                {% elif tarefa.status == 'em_andamento' %}
+                                                <span class="badge bg-info">{{ tarefa.get_status_display }}</span>
+                                                {% elif tarefa.status == 'concluida' %}
+                                                <span class="badge bg-success">{{ tarefa.get_status_display }}</span>
+                                                {% elif tarefa.status == 'cancelada' %}
+                                                <span class="badge bg-secondary">{{ tarefa.get_status_display }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ tarefa.responsavel }}</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="text-center">Nenhuma atividade registrada.</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fotos do quarto -->
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Fotos do Quarto</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for foto in quarto.fotos.all %}
+                        <div class="col-md-3 mb-4">
+                            <div class="card">
+                                <img src="{{ foto.imagem.url }}" class="card-img-top" alt="{{ foto.legenda|default:'Foto do quarto' }}">
+                                {% if foto.legenda %}
+                                <div class="card-footer text-center">
+                                    {{ foto.legenda }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12 text-center">
+                            <p class="text-muted">Nenhuma foto cadastrada para este quarto.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para aplicar desconto -->
+<div class="modal fade" id="descontoModal" tabindex="-1" role="dialog" aria-labelledby="descontoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="descontoModalLabel">Aplicar Desconto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="{% url 'quartos:aplicar_desconto' pk=quarto.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="desconto">Percentual de Desconto (0-50%):</label>
+                        <input type="number" class="form-control" id="desconto" name="desconto" min="0" max="50" value="{{ quarto.desconto_porcentagem }}" required>
+                        <small class="form-text text-muted">
+                            Diária normal: R$ {{ quarto.preco_diaria }}<br>
+                            Desconto atual: {{ quarto.desconto_porcentagem }}%
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Aplicar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

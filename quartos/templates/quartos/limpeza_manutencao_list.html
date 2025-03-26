@@ -1,0 +1,233 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Limpeza e Manutenção - Pousada Pajeú{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Gerenciamento de Limpeza e Manutenção</h1>
+        <p class="text-muted">Controle as tarefas de limpeza e manutenção dos quartos</p>
+    </div>
+
+    <!-- Cards de resumo -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total de Tarefas</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_tarefas }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Tarefas Agendadas</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ tarefas_agendadas }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Em Andamento</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ tarefas_em_andamento }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-spinner fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Concluídas</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ tarefas_concluidas }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros e ações -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Filtros</h6>
+            <a href="{% url 'quartos:limpeza_manutencao_create' %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus-circle"></i> Nova Tarefa
+            </a>
+        </div>
+        <div class="card-body">
+            <form method="get" class="mb-4">
+                <div class="row">
+                    <div class="col-md-2 mb-2">
+                        <label for="tipo">Tipo:</label>
+                        <select name="tipo" id="tipo" class="form-control form-control-sm">
+                            <option value="">Todos</option>
+                            {% for tipo_id, tipo_nome in tipos %}
+                                <option value="{{ tipo_id }}" {% if request.GET.tipo == tipo_id %}selected{% endif %}>{{ tipo_nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <label for="status">Status:</label>
+                        <select name="status" id="status" class="form-control form-control-sm">
+                            <option value="">Todos</option>
+                            {% for status_id, status_nome in status_options %}
+                                <option value="{{ status_id }}" {% if request.GET.status == status_id %}selected{% endif %}>{{ status_nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <label for="prioridade">Prioridade:</label>
+                        <select name="prioridade" id="prioridade" class="form-control form-control-sm">
+                            <option value="">Todas</option>
+                            {% for prio_id, prio_nome in prioridades %}
+                                <option value="{{ prio_id }}" {% if request.GET.prioridade == prio_id %}selected{% endif %}>{{ prio_nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <label for="quarto">Quarto:</label>
+                        <select name="quarto" id="quarto" class="form-control form-control-sm">
+                            <option value="">Todos</option>
+                            {% for quarto in quartos %}
+                                <option value="{{ quarto.id }}" {% if request.GET.quarto == quarto.id|stringformat:"i" %}selected{% endif %}>{{ quarto.numero }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <label for="data_inicio">Data Início:</label>
+                        <input type="date" name="data_inicio" id="data_inicio" class="form-control form-control-sm" value="{{ request.GET.data_inicio }}">
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <label for="data_fim">Data Fim:</label>
+                        <input type="date" name="data_fim" id="data_fim" class="form-control form-control-sm" value="{{ request.GET.data_fim }}">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <a href="{% url 'quartos:limpeza_manutencao_list' %}" class="btn btn-sm btn-outline-secondary ml-2">
+                        <i class="fas fa-undo"></i> Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabela de tarefas -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Lista de Tarefas</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Quarto</th>
+                            <th>Tipo</th>
+                            <th>Prioridade</th>
+                            <th>Status</th>
+                            <th>Responsável</th>
+                            <th>Data Agendada</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tarefa in tarefas %}
+                        <tr>
+                            <td>{{ tarefa.id }}</td>
+                            <td>{{ tarefa.quarto.numero }}</td>
+                            <td>{{ tarefa.get_tipo_display }}</td>
+                            <td>
+                                {% if tarefa.prioridade == 'baixa' %}
+                                <span class="badge bg-success">{{ tarefa.get_prioridade_display }}</span>
+                                {% elif tarefa.prioridade == 'media' %}
+                                <span class="badge bg-info">{{ tarefa.get_prioridade_display }}</span>
+                                {% elif tarefa.prioridade == 'alta' %}
+                                <span class="badge bg-warning">{{ tarefa.get_prioridade_display }}</span>
+                                {% elif tarefa.prioridade == 'urgente' %}
+                                <span class="badge bg-danger">{{ tarefa.get_prioridade_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if tarefa.status == 'agendada' %}
+                                <span class="badge bg-warning">{{ tarefa.get_status_display }}</span>
+                                {% elif tarefa.status == 'em_andamento' %}
+                                <span class="badge bg-info">{{ tarefa.get_status_display }}</span>
+                                {% elif tarefa.status == 'concluida' %}
+                                <span class="badge bg-success">{{ tarefa.get_status_display }}</span>
+                                {% elif tarefa.status == 'cancelada' %}
+                                <span class="badge bg-secondary">{{ tarefa.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ tarefa.responsavel }}</td>
+                            <td>{{ tarefa.data_agendamento|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'quartos:limpeza_manutencao_detail' pk=tarefa.pk %}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'quartos:limpeza_manutencao_update' pk=tarefa.pk %}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if tarefa.status == 'agendada' %}
+                                    <a href="{% url 'quartos:iniciar_tarefa' pk=tarefa.pk %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-play"></i>
+                                    </a>
+                                    {% elif tarefa.status == 'em_andamento' %}
+                                    <a href="{% url 'quartos:concluir_tarefa' pk=tarefa.pk %}" class="btn btn-sm btn-success">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">Nenhuma tarefa encontrada.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
