@@ -177,3 +177,197 @@ Corrigir dois problemas importantes: (1) a falta de destaque visual para dias co
 - Lógica de negócio corrigida para impedir operações que não fazem sentido
 - Melhor experiência do usuário com botões de ação que só aparecem quando realmente podem ser utilizados
 - Prevenção de erros na geração de histórico e status de quartos 
+
+### [2024-03-27] Implementação de Testes e Correções no Sistema de Pagamentos
+
+- **Arquivos Modificados**:
+  - `pousada_app/financeiro/templates/financeiro/calendario.html`
+  - `pousada_app/reservas/models.py`
+  - `pousada_app/reservas/views.py`
+  - `pousada_app/financeiro/forms.py`
+  - `pousada_app/financeiro/tests.py`
+  - `pousada_app/reservas/tests.py`
+  - `pousada_app/quartos/tests.py`
+
+- **Objetivo**:
+  Implementar testes automatizados para validar o sistema de pagamentos e corrigir inconsistências identificadas durante a análise.
+
+- **Mudanças Realizadas**:
+  1. **Correções no Sistema de Pagamentos**:
+     - Corrigidos os parâmetros enviados na API de pagamento AJAX (`calendario.html`)
+     - Adicionados métodos ao modelo `Reserva` para centralizar o cálculo de saldos pendentes
+     - Atualizada a lógica para permitir pagamentos para reservas em andamento
+     - Corrigida a criação de registros de receita para todos os status permitidos
+
+  2. **Implementação de Testes Automatizados**:
+     - Criados testes para o módulo de pagamentos (validação de limites, registro correto)
+     - Criados testes para o modelo de reserva (cálculo de valores, verificação de status)
+     - Criados testes para check-in e check-out
+     - Criados testes para o módulo de quartos (disponibilidade, preços com desconto)
+
+- **Resultados**:
+  Implementamos testes automatizados abrangentes que validam as funcionalidades críticas da aplicação, especialmente o sistema de pagamentos. As correções realizadas garantem maior consistência no registro de pagamentos e melhor integração entre os módulos.
+
+- **Conversa**:
+  - Pergunta: "Posso testar? Ou tem mais algum erro para consertar?"
+  - Resposta: "Você pode testar o sistema. Os problemas identificados são potenciais incongruências que podem causar erros em determinadas situações, mas o fluxo básico deve funcionar. Sugiro corrigir os problemas mais críticos antes de testar."
+  - Decisão: Foram implementadas correções para os problemas mais críticos antes dos testes.
+
+### [2024-03-28] Melhorias no Sistema de Pagamentos e Implementação de Notificações
+
+- **Arquivos Modificados/Criados**:
+  - `pousada_app/reservas/views.py`
+  - `pousada_app/reservas/urls.py`
+  - `pousada_app/financeiro/templates/financeiro/calendario.html`
+  - `pousada_app/reservas/templates/reservas/detalhe_reserva.html`
+  - `pousada_app/notificacoes/models.py`
+
+- **Objetivo**:
+  Implementar melhorias no sistema de pagamentos e adicionar um sistema de notificações para alertar sobre pagamentos pendentes, check-ins e check-outs.
+
+- **Mudanças Realizadas**:
+  1. **Otimizações de Performance**:
+     - Reduzida a repetição de cálculos na view `detalhes_dia` usando consultas agrupadas
+     - Implementada pré-carga de pagamentos para melhorar o desempenho
+
+  2. **Melhorias de Usabilidade**:
+     - Adicionada confirmação visual ao registrar pagamentos através de um modal específico
+     - Implementado histórico detalhado de pagamentos na interface de detalhes da reserva
+     - Adicionados efeitos visuais para botões e indicadores de status de pagamento
+
+  3. **Integração e Notificações**:
+     - Criado módulo de notificações para alertar sobre pagamentos pendentes
+     - Implementadas notificações para check-in e check-out programados para o dia atual
+     - Adicionada funcionalidade para registrar pagamentos diretamente na página de detalhes da reserva
+
+- **Resultados**:
+  As melhorias implementadas tornaram o sistema mais eficiente, com melhor experiência do usuário e uma integração mais forte entre os módulos de reservas e financeiro. O novo sistema de notificações permite que os usuários sejam alertados sobre ações importantes a serem tomadas, como receber pagamentos pendentes ou realizar check-ins programados.
+
+- **Decisões Técnicas**:
+  - Utilizamos GenericForeignKey para permitir que o sistema de notificações se relacione com qualquer modelo
+  - Implementamos métodos de classe para facilitar a criação de notificações específicas
+  - Otimizamos as consultas ao banco de dados para reduzir o número de queries e melhorar o desempenho 
+
+### [2024-03-28] Correção do Dashboard Financeiro e Calendário
+
+- **Arquivos Modificados**:
+  - `pousada_app/financeiro/views.py`
+
+- **Objetivo**:
+  Corrigir o problema dos dashboards financeiros e calendário não exibirem dados reais, mostrando valores zerados mesmo quando existem dados no banco de dados.
+
+- **Mudanças Realizadas**:
+  1. **Dashboard Financeiro**:
+     - Substituição dos valores simulados por consultas reais ao banco de dados
+     - Implementação de consultas para buscar pagamentos, receitas e despesas dentro do período selecionado
+     - Correção do cálculo de receitas e despesas por mês para o gráfico de 6 meses
+     - Adição de consultas para dados reais de ocupação, alertas e próximos pagamentos
+
+  2. **Calendário de Reservas**:
+     - Remoção de código de eventos simulados que estava substituindo os dados reais
+     - Garantia de que o calendário utiliza corretamente as chamadas AJAX para buscar as reservas
+
+- **Resultados**:
+  O dashboard financeiro agora exibe os valores reais de receitas, despesas e saldo para o período selecionado. O gráfico de 6 meses mostra os dados históricos corretos e o resumo de ocupação reflete a situação atual dos quartos. O calendário de reservas exibe corretamente todas as reservas cadastradas no sistema.
+
+- **Conversa**:
+  - Problema reportado: "Nas dashboards e no calendário não aparecem os dados criados, é tudo 0 reais e o calendário não tem referências de reservas"
+  - Causa identificada: As views estavam utilizando dados simulados/hardcoded em vez de buscar dados do banco de dados
+  - Solução: Atualização das views para usar consultas reais ao banco de dados em vez de dados simulados
+
+## 2024-05-25: Implementação do Sistema de Notificações
+
+**Arquivos modificados/criados:**
+- `pousada_app/notificacoes/models.py`
+- `pousada_app/notificacoes/views.py`
+- `pousada_app/notificacoes/urls.py`
+- `pousada_app/notificacoes/admin.py`
+- `pousada_app/notificacoes/apps.py`
+- `pousada_app/notificacoes/signals.py`
+- `pousada_app/notificacoes/templatetags/notificacoes_tags.py`
+- `pousada_app/notificacoes/templates/notificacoes/listar.html`
+- `pousada_app/notificacoes/templates/notificacoes/partials/notificacao_item.html`
+- `pousada_app/notificacoes/templates/notificacoes/partials/menu_notificacoes.html`
+- `pousada_app/pousada_app/templates/base/base.html`
+- `pousada_app/pousada_app/urls.py`
+- `pousada_app/reservas/models.py`
+- `pousada_app/quartos/models.py`
+
+**Objetivo:**
+Implementar um sistema completo de notificações para alertar os usuários sobre eventos importantes do sistema, como novas reservas, pagamentos, alterações de status, check-ins pendentes e outras informações relevantes para a gestão da pousada.
+
+**Alterações realizadas:**
+
+1. **Criação do módulo de notificações:**
+   - Modelo `Notificacao` para armazenar mensagens com título, conteúdo, categoria, tipo, status de leitura e links de ação
+   - Categorias definidas: reserva, pagamento, hospede, quarto, sistema
+   - Tipos de notificação: info, success, warning, danger
+   
+2. **Sistema de sinais para automação:**
+   - Implementação de sinais (signals) para criar notificações automaticamente em eventos do sistema
+   - Monitoramento de alterações em reservas, pagamentos, hóspedes e quartos
+   - Notificações especiais para check-ins programados para hoje e amanhã
+   
+3. **Interface para visualização:**
+   - Página de listagem de notificações com filtros por categoria e status
+   - Menu dropdown no cabeçalho com contador de notificações não lidas
+   - Tags de template para exibir contadores e listas de notificações
+   - Funcionalidade para marcar notificações como lidas individualmente ou em grupo
+   
+4. **Modificações em modelos existentes:**
+   - Adição de campo `status_anterior` em `Reserva` e `Quarto` para rastrear mudanças de status
+   - Ajustes nas relações entre modelos para facilitar a criação de notificações
+   
+5. **AJAX e experiência do usuário:**
+   - Endpoints JSON para atualização em tempo real das notificações
+   - Indicadores visuais para novidades (badges e ícones)
+   - Redirecionamentos diretos para as telas relevantes aos eventos notificados
+
+**Resumo da conversa:**
+O usuário solicitou a implementação de um sistema de notificações para melhorar a gestão da pousada. Desenvolvemos um sistema completo que monitora automaticamente eventos importantes como reservas, pagamentos e mudanças de status, notificando os usuários através de um menu dropdown no cabeçalho e uma página de listagem detalhada. 
+
+A solução incluiu:
+- Um modelo para armazenar diferentes tipos de notificações
+- Um sistema de sinais para detectar eventos importantes automaticamente
+- Tags de template para fácil integração em qualquer página
+- Uma interface amigável para visualizar e gerenciar notificações
+- Integração com os modelos existentes para monitoramento eficiente
+
+O resultado é um sistema que mantém os usuários informados sobre eventos importantes sem que precisem verificar manualmente diferentes seções do sistema, melhorando a eficiência operacional da pousada. 
+
+### [2024-03-26] Correções de Bugs e Templates Ausentes
+- **Arquivos modificados/criados:**
+  - `pousada_app/reservas/templates/reservas/confirmar.html` (novo)
+  - `pousada_app/reservas/templates/reservas/cancelar.html` (novo)
+  - `pousada_app/website/templates/website/quartos_lista.html` (novo)
+  - `pousada_app/website/templates/website/quartos_categoria.html` (novo)
+  - `pousada_app/website/templates/website/pagina.html` (novo)
+  - `pousada_app/quartos/templates/quartos/quarto_list.html` (novo)
+  - `pousada_app/quartos/templates/quartos/limpeza_manutencao_form.html` (novo)
+  - `pousada_app/financeiro/templates/financeiro/pagamento_form.html` (novo)
+  - `pousada_app/financeiro/templates/financeiro/pagamento_detail.html` (novo)
+  - `pousada_app/reservas/views.py` (corrigido)
+  - `pousada_app/notificacoes/models.py` (corrigido)
+  - `pousada_app/quartos/models.py` (corrigido)
+  - `pousada_app/financeiro/views.py` (adicionado método registrar_pagamento_ajax)
+  - `pousada_app/financeiro/urls.py` (adicionada URL para pagamento via AJAX)
+
+- **Objetivo:**
+  - Resolver problemas e inconsistências identificados na aplicação
+  - Criar templates ausentes que eram referenciados em views
+  - Corrigir problemas de modelo e funções
+
+- **Problemas corrigidos:**
+  1. Adicionados templates ausentes que estavam listados como faltantes
+  2. Corrigido o método `realizar_check_in` para usar `quantidade_adultos` e `quantidade_criancas` em vez de `acompanhantes`
+  3. Corrigidos métodos `notificar_check_in_hoje` e `notificar_check_out_hoje` no modelo de notificações para comparar corretamente campos DateTime, usando `__date`
+  4. Corrigidas URLs referenciadas em notificações para apontarem para os caminhos corretos
+  5. Corrigido redirecionamento em `processar_check_in_direto` para usar `financeiro:calendario` em vez de `reservas:calendario`
+  6. Melhorada a sincronização entre `status` e `disponivel` no modelo Quarto para evitar inconsistências
+  7. Adicionado método `registrar_pagamento_ajax` no app financeiro
+  8. Ajustada a URL para registrar pagamentos via AJAX
+
+- **Conversa:**
+  - Problema identificado: "Quero que você analise profundamente a aplicação e analise todas as templates e os respectivos modelos para achar falhas, e para achar templates que não existem mas que você colocou caminhos"
+  - Diagnóstico realizado identificando problemas como templates ausentes, inconsistências nos modelos, erros nas URLs e problemas no tratamento de datas.
+  - Implementada uma solução abrangente para resolver todos os problemas identificados. 

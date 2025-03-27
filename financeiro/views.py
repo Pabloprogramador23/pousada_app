@@ -5,12 +5,13 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Sum, Q
 from django.utils import timezone
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import calendar
 import json
 import logging
+from django.views.decorators.http import require_POST
 
 from .models import Pagamento, Despesa, Receita, Alerta
 from .forms import PagamentoForm, DespesaForm, ReceitaForm, AlertaForm, FiltroPeriodoForm
@@ -44,12 +45,29 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['data_inicio'] = data_inicio
         context['data_fim'] = data_fim
         
-        # Valores simulados para evitar erros de tabelas ausentes
-        total_pagamentos = 0
-        total_receitas = 0
-        total_despesas = 0
+        # Busca valores reais do banco de dados
+        # Pagamentos (receitas de reservas)
+        pagamentos = Pagamento.objects.filter(
+            status='aprovado',
+            data_pagamento__date__range=(data_inicio, data_fim)
+        )
+        total_pagamentos = pagamentos.aggregate(total=Sum('valor'))['total'] or 0
         
-        # Dados simulados para o gráfico de receitas vs despesas (últimos 6 meses)
+        # Outras receitas
+        receitas = Receita.objects.filter(
+            status='recebido',
+            data_recebimento__range=(data_inicio, data_fim)
+        )
+        total_receitas = receitas.aggregate(total=Sum('valor'))['total'] or 0
+        
+        # Despesas
+        despesas = Despesa.objects.filter(
+            status='pago',
+            data_pagamento__range=(data_inicio, data_fim)
+        )
+        total_despesas = despesas.aggregate(total=Sum('valor'))['total'] or 0
+        
+        # Dados para o gráfico de receitas vs despesas (últimos 6 meses)
         meses = []
         receitas_por_mes = []
         despesas_por_mes = []
@@ -58,28 +76,63 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             data_ref = hoje.replace(day=1) - timedelta(days=i*30)
             mes = data_ref.month
             ano = data_ref.year
+            primeiro_dia = date(ano, mes, 1)
+            if mes == 12:
+                ultimo_dia = date(ano + 1, 1, 1) - timedelta(days=1)
+            else:
+                ultimo_dia = date(ano, mes + 1, 1) - timedelta(days=1)
             
             nome_mes = calendar.month_name[mes]
             meses.append(f"{nome_mes[:3]}/{ano}")
-            # Dados simulados
-            receitas_por_mes.append(0)
-            despesas_por_mes.append(0)
+            
+            # Receitas do mês (pagamentos + outras receitas)
+            receitas_mes = Pagamento.objects.filter(
+                status='aprovado',
+                data_pagamento__date__range=(primeiro_dia, ultimo_dia)
+            ).aggregate(total=Sum('valor'))['total'] or 0
+            
+            outras_receitas_mes = Receita.objects.filter(
+                status='recebido',
+                data_recebimento__range=(primeiro_dia, ultimo_dia)
+            ).aggregate(total=Sum('valor'))['total'] or 0
+            
+            # Despesas do mês
+            despesas_mes = Despesa.objects.filter(
+                status='pago',
+                data_pagamento__range=(primeiro_dia, ultimo_dia)
+            ).aggregate(total=Sum('valor'))['total'] or 0
+            
+            receitas_por_mes.append(float(receitas_mes + outras_receitas_mes))
+            despesas_por_mes.append(float(despesas_mes))
         
-        # Dados simulados para outros elementos da página
-        alertas = []
-        proximos_pagamentos = []
-        proximas_despesas = []
+        # Alertas e próximos pagamentos/despesas
+        alertas = Alerta.objects.filter(resolvido=False).order_by('-nivel_urgencia')[:5]
+        
+        proximos_pagamentos = Pagamento.objects.filter(
+            status='pendente'
+        ).order_by('data_pagamento')[:5]
+        
+        proximas_despesas = Despesa.objects.filter(
+            status='pendente',
+            data_vencimento__gte=hoje
+        ).order_by('data_vencimento')[:5]
         
         # Resumo de ocupação atual
         total_quartos = Quarto.objects.count()
-        quartos_ocupados = 0
-        taxa_ocupacao = 0
+        quartos_ocupados = Quarto.objects.filter(status='ocupado').count()
+        taxa_ocupacao = (quartos_ocupados / total_quartos * 100) if total_quartos > 0 else 0
+        
+        # Conta total de reservas no período
+        total_reservas = Reserva.objects.filter(
+            check_in__date__lte=data_fim,
+            check_out__date__gte=data_inicio
+        ).count()
         
         context.update({
             'total_pagamentos': total_pagamentos,
             'total_receitas': total_receitas,
             'total_despesas': total_despesas,
-            'total_reservas': 0,
+            'total_reservas': total_reservas,
             'saldo_periodo': total_pagamentos + total_receitas - total_despesas,
             
             # Dados para gráficos
@@ -110,10 +163,10 @@ class CalendarioReservasView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Fornecendo dados simulados para evitar erros de tabelas ausentes
-        eventos = []
+        # Não precisa mais fornecer eventos JSON diretamente
+        # pois eles serão carregados via AJAX pela função eventos_calendario
         
-        context['eventos_json'] = json.dumps(eventos)
+        # Carrega os quartos para filtro
         context['quartos'] = Quarto.objects.all()
         
         return context
@@ -827,7 +880,7 @@ def marcar_receita_como_recebida(request, pk):
                 pagamento = Pagamento(
                     reserva=receita.reserva,
                     valor=receita.valor,
-                    tipo=forma_pagamento,
+                    forma_pagamento=forma_pagamento,
                     status='aprovado',
                     data_pagamento=timezone.now(),
                     observacoes=f'Gerado automaticamente a partir da receita #{receita.id}'
@@ -845,3 +898,50 @@ def marcar_receita_como_recebida(request, pk):
             logger.error(f'Erro ao marcar receita {receita.id} como recebida: {str(e)}')
     
     return redirect('financeiro:receitas')
+
+@login_required
+@require_POST
+def registrar_pagamento_ajax(request):
+    """
+    View para registrar um pagamento via AJAX.
+    """
+    try:
+        reserva_codigo = request.POST.get('reserva_codigo')
+        valor = request.POST.get('valor')
+        forma_pagamento = request.POST.get('forma_pagamento')
+        
+        # Validação básica
+        if not all([reserva_codigo, valor, forma_pagamento]):
+            return JsonResponse({'status': 'error', 'mensagem': 'Dados incompletos'}, status=400)
+        
+        try:
+            valor = float(valor)
+        except ValueError:
+            return JsonResponse({'status': 'error', 'mensagem': 'Valor inválido'}, status=400)
+        
+        # Busca a reserva
+        try:
+            from reservas.models import Reserva
+            reserva = Reserva.objects.get(codigo=reserva_codigo)
+        except (ImportError, Reserva.DoesNotExist):
+            return JsonResponse({'status': 'error', 'mensagem': 'Reserva não encontrada'}, status=404)
+        
+        # Cria o pagamento
+        pagamento = Pagamento.objects.create(
+            reserva=reserva,
+            valor=valor,
+            forma_pagamento=forma_pagamento,
+            data_pagamento=timezone.now(),
+            confirmado=True,
+            criado_por=request.user,
+            confirmado_por=request.user,
+            data_confirmacao=timezone.now()
+        )
+        
+        return JsonResponse({
+            'status': 'success',
+            'pagamento_id': pagamento.id,
+            'mensagem': 'Pagamento registrado com sucesso'
+        })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'mensagem': str(e)}, status=500)

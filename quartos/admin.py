@@ -40,11 +40,11 @@ class QuartoAdmin(admin.ModelAdmin):
     """
     Configuração do admin para o modelo Quarto.
     """
-    list_display = ('numero', 'categoria', 'andar', 'status', 'preco_diaria', 'desconto_porcentagem', 'preco_com_desconto', 'ultima_limpeza')
-    list_filter = ('categoria', 'andar', 'status', 'possui_ar_condicionado', 'possui_varanda')
+    list_display = ('numero', 'categoria', 'andar', 'status', 'preco_diaria', 'desconto_porcentagem', 'preco_com_desconto', 'data_ultima_limpeza')
+    list_filter = ('categoria', 'andar', 'status', 'tem_ar_condicionado', 'tem_varanda')
     search_fields = ('numero', 'observacoes')
     list_editable = ('status', 'desconto_porcentagem')
-    readonly_fields = ('data_criacao', 'data_atualizacao', 'ultima_limpeza')
+    readonly_fields = ('data_criacao', 'data_atualizacao', 'data_ultima_limpeza')
     inlines = [FotoQuartoInline]
     
     fieldsets = (
@@ -56,11 +56,11 @@ class QuartoAdmin(admin.ModelAdmin):
             'description': 'Configure o preço base do quarto e aplique descontos especiais (até 50%)'
         }),
         ('Comodidades', {
-            'fields': ('possui_ar_condicionado', 'possui_tv', 'possui_frigobar', 
-                      'possui_cofre', 'possui_varanda')
+            'fields': ('tem_ar_condicionado', 'tem_tv', 'tem_frigobar', 
+                      'tem_varanda', 'tem_banheira')
         }),
         ('Limpeza e Manutenção', {
-            'fields': ('ultima_limpeza', 'proxima_manutencao')
+            'fields': ('data_ultima_limpeza', 'proxima_manutencao')
         }),
         ('Observações', {
             'fields': ('observacoes',)

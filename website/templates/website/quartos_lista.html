@@ -1,0 +1,178 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}Quartos Disponíveis - Pousada Pajeú{% endblock %}
+
+{% block content %}
+<section class="hero-section" style="background-image: url('{% static 'website/img/quartos-banner.jpg' %}')">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="text-white mb-4">Nossos Quartos</h1>
+            <p class="text-white mb-4">Conforto e tranquilidade para sua estadia</p>
+        </div>
+    </div>
+</section>
+
+<section class="quartos-section py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="section-title text-center">Conheça Nossas Acomodações</h2>
+                <p class="section-subtitle text-center">Escolha o quarto ideal para sua estadia</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="filtro-card">
+                    <h5 class="mb-3">Filtrar por:</h5>
+                    <form method="get" action="{% url 'website:quartos_lista' %}">
+                        <div class="form-group mb-3">
+                            <label>Categoria:</label>
+                            <select name="categoria" class="form-select">
+                                <option value="">Todas as categorias</option>
+                                {% for categoria in categorias %}
+                                <option value="{{ categoria.id }}" {% if request.GET.categoria|add:"0" == categoria.id %}selected{% endif %}>{{ categoria.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label>Capacidade:</label>
+                            <select name="capacidade" class="form-select">
+                                <option value="">Qualquer</option>
+                                <option value="1" {% if request.GET.capacidade == "1" %}selected{% endif %}>1 pessoa</option>
+                                <option value="2" {% if request.GET.capacidade == "2" %}selected{% endif %}>2 pessoas</option>
+                                <option value="3" {% if request.GET.capacidade == "3" %}selected{% endif %}>3 pessoas</option>
+                                <option value="4" {% if request.GET.capacidade == "4" %}selected{% endif %}>4+ pessoas</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="ar_condicionado" id="ar_condicionado" {% if request.GET.ar_condicionado %}checked{% endif %}>
+                                <label class="form-check-label" for="ar_condicionado">
+                                    Ar condicionado
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="wifi" id="wifi" {% if request.GET.wifi %}checked{% endif %}>
+                                <label class="form-check-label" for="wifi">
+                                    Wi-Fi
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="frigobar" id="frigobar" {% if request.GET.frigobar %}checked{% endif %}>
+                                <label class="form-check-label" for="frigobar">
+                                    Frigobar
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="varanda" id="varanda" {% if request.GET.varanda %}checked{% endif %}>
+                                <label class="form-check-label" for="varanda">
+                                    Varanda
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-md-9">
+                <div class="row">
+                    {% if quartos %}
+                        {% for quarto in quartos %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card quarto-card h-100">
+                                {% if quarto.fotos.exists %}
+                                <img src="{{ quarto.fotos.first.imagem.url }}" class="card-img-top" alt="{{ quarto.categoria.nome }}">
+                                {% else %}
+                                <img src="{% static 'website/img/quarto-padrao.jpg' %}" class="card-img-top" alt="{{ quarto.categoria.nome }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ quarto.categoria.nome }}</h5>
+                                    <p class="card-text">{{ quarto.descricao|truncatewords:20 }}</p>
+                                    <ul class="amenities-list">
+                                        <li><i class="fas fa-user-friends"></i> {{ quarto.capacidade }} pessoa(s)</li>
+                                        {% if quarto.tem_ar_condicionado %}
+                                        <li><i class="fas fa-snowflake"></i> Ar condicionado</li>
+                                        {% endif %}
+                                        {% if quarto.tem_wifi %}
+                                        <li><i class="fas fa-wifi"></i> Wi-Fi</li>
+                                        {% endif %}
+                                        {% if quarto.tem_frigobar %}
+                                        <li><i class="fas fa-cocktail"></i> Frigobar</li>
+                                        {% endif %}
+                                    </ul>
+                                    <div class="price-container">
+                                        <span class="price">R$ {{ quarto.preco_diaria|floatformat:2 }}</span>
+                                        <span class="period">/ diária</span>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0">
+                                    <a href="{% url 'website:quarto_detalhe' quarto.id %}" class="btn btn-outline-primary w-100">Ver Detalhes</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <p class="mb-0">Nenhum quarto encontrado com os filtros selecionados.</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if quartos.has_other_pages %}
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <nav>
+                            <ul class="pagination justify-content-center">
+                                {% if quartos.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ quartos.previous_page_number }}&{{ request.GET.urlencode }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                {% for num in quartos.paginator.page_range %}
+                                <li class="page-item {% if quartos.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?page={{ num }}&{{ request.GET.urlencode }}">{{ num }}</a>
+                                </li>
+                                {% endfor %}
+                                
+                                {% if quartos.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ quartos.next_page_number }}&{{ request.GET.urlencode }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 text-center">
+                <h3>Quer fazer sua reserva?</h3>
+                <p class="mb-4">Entre em contato conosco ou faça sua reserva diretamente pelo site.</p>
+                <a href="{% url 'website:contato' %}" class="btn btn-outline-primary me-2">Contato</a>
+                <a href="{% url 'reservas:nova' %}" class="btn btn-primary">Reservar Agora</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

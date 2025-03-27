@@ -17,6 +17,9 @@ urlpatterns = [
     path('check-in/direto/processar/', views.processar_check_in_direto, name='processar_check_in_direto'),
     path('check-out/<str:codigo>/', views.realizar_check_out, name='realizar_check_out'),
     
+    # Detalhes e Histórico
+    path('detalhe/<str:codigo>/', views.DetalheReservaView.as_view(), name='detalhe_reserva'),
+    
     # Calendário
     path('eventos-calendario/', views.eventos_calendario, name='eventos_calendario'),
     path('detalhes-dia/', views.detalhes_dia, name='detalhes_dia'),

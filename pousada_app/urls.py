@@ -25,6 +25,8 @@ urlpatterns = [
     path('reservas/', include('reservas.urls')),
     path('financeiro/', include('financeiro.urls')),  # URLs do módulo financeiro
     path('quartos/', include('quartos.urls')),  # URLs do módulo de quartos
+    path('hospedes/', include('hospedes.urls')),
+    path('notificacoes/', include('notificacoes.urls')),
 ]
 
 # Configuração para servir arquivos de mídia em ambiente de desenvolvimento

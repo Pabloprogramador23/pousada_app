@@ -145,8 +145,8 @@
                                 <td>{{ alerta.titulo }}</td>
                                 <td>{{ alerta.data_criacao|date:"d/m/Y" }}</td>
                                 <td>
-                                    <a href="{% url 'financeiro:alerta_detalhe' alerta.id %}" class="btn btn-sm btn-outline-primary">Ver</a>
-                                    <a href="{% url 'financeiro:alerta_resolver' alerta.id %}" class="btn btn-sm btn-outline-success">Resolver</a>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">Ver</a>
+                                    <a href="#" class="btn btn-sm btn-outline-success">Resolver</a>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -157,7 +157,7 @@
                 <p class="text-center">Não há alertas pendentes.</p>
                 {% endif %}
                 <div class="text-center mt-3">
-                    <a href="{% url 'financeiro:alertas' %}" class="btn btn-outline-primary">Ver Todos</a>
+                    <a href="#" class="btn btn-outline-primary">Ver Todos</a>
                 </div>
             </div>
         </div>
@@ -245,13 +245,18 @@
     // Gráfico de Receitas x Despesas
     var ctx = document.getElementById('financialChart').getContext('2d');
     
+    // Usar dados vazios caso não existam
+    var categorias = {{ categorias_meses|default:"[]"|safe }};
+    var dadosReceitas = {{ dados_receitas|default:"[]"|safe }};
+    var dadosDespesas = {{ dados_despesas|default:"[]"|safe }};
+    
     var financialChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: {{ categorias_meses|safe }},
+            labels: categorias,
             datasets: [{
                 label: 'Receitas',
-                data: {{ dados_receitas|safe }},
+                data: dadosReceitas,
                 borderColor: '#34c38f',
                 backgroundColor: 'rgba(52, 195, 143, 0.1)',
                 borderWidth: 2,
@@ -259,7 +264,7 @@
                 tension: 0.4
             }, {
                 label: 'Despesas',
-                data: {{ dados_despesas|safe }},
+                data: dadosDespesas,
                 borderColor: '#f46a6a',
                 backgroundColor: 'rgba(244, 106, 106, 0.1)',
                 borderWidth: 2,

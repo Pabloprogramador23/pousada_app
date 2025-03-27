@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quartos - Administração{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Gerenciamento de Quartos</h1>
+        <div>
+            <a href="{% url 'quartos:quarto_novo' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Novo Quarto
+            </a>
+        </div>
+    </div>
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="mb-0">Quartos Cadastrados</h5>
+                </div>
+                <div class="col-md-4">
+                    <form method="get" class="d-flex">
+                        <input type="text" name="q" class="form-control" placeholder="Buscar por número ou tipo..." value="{{ request.GET.q|default:'' }}">
+                        <button type="submit" class="btn btn-outline-primary ms-2">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Número</th>
+                            <th>Categoria</th>
+                            <th>Tipo</th>
+                            <th>Capacidade</th>
+                            <th>Preço Diária</th>
+                            <th>Status</th>
+                            <th>Última Limpeza</th>
+                            <th width="100">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for quarto in quartos %}
+                        <tr>
+                            <td>{{ quarto.numero }}</td>
+                            <td>{{ quarto.categoria.nome }}</td>
+                            <td>{{ quarto.get_tipo_display }}</td>
+                            <td>{{ quarto.capacidade }} pessoas</td>
+                            <td>R$ {{ quarto.preco_diaria|floatformat:2 }}</td>
+                            <td>
+                                {% if quarto.status == 'disponivel' %}
+                                <span class="badge bg-success">Disponível</span>
+                                {% elif quarto.status == 'ocupado' %}
+                                <span class="badge bg-danger">Ocupado</span>
+                                {% elif quarto.status == 'manutencao' %}
+                                <span class="badge bg-warning">Manutenção</span>
+                                {% elif quarto.status == 'limpeza' %}
+                                <span class="badge bg-info">Limpeza</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if quarto.data_ultima_limpeza %}
+                                {{ quarto.data_ultima_limpeza|date:"d/m/Y" }}
+                                {% else %}
+                                <span class="text-muted">Não registrada</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'quartos:quarto_detalhe' quarto.id %}" class="btn btn-outline-primary" title="Ver detalhes">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'quartos:quarto_editar' quarto.id %}" class="btn btn-outline-secondary" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'quartos:registrar_limpeza' quarto.id %}">
+                                                <i class="fas fa-broom"></i> Registrar Limpeza
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'quartos:registrar_manutencao' quarto.id %}">
+                                                <i class="fas fa-tools"></i> Registrar Manutenção
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="#" 
+                                               data-bs-toggle="modal" data-bs-target="#modalStatus{{ quarto.id }}">
+                                                <i class="fas fa-exchange-alt"></i> Alterar Status
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Modal para Alterar Status -->
+                                <div class="modal fade" id="modalStatus{{ quarto.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Alterar Status do Quarto {{ quarto.numero }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form method="post" action="{% url 'quartos:alterar_status' quarto.id %}">
+                                                {% csrf_token %}
+                                                <div class="modal-body">
+                                                    <div class="form-group">
+                                                        <label for="status{{ quarto.id }}">Novo Status:</label>
+                                                        <select name="status" id="status{{ quarto.id }}" class="form-select">
+                                                            <option value="disponivel" {% if quarto.status == 'disponivel' %}selected{% endif %}>Disponível</option>
+                                                            <option value="ocupado" {% if quarto.status == 'ocupado' %}selected{% endif %}>Ocupado</option>
+                                                            <option value="manutencao" {% if quarto.status == 'manutencao' %}selected{% endif %}>Manutenção</option>
+                                                            <option value="limpeza" {% if quarto.status == 'limpeza' %}selected{% endif %}>Limpeza</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group mt-3">
+                                                        <label for="observacao{{ quarto.id }}">Observação:</label>
+                                                        <textarea name="observacao" id="observacao{{ quarto.id }}" rows="3" class="form-control"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="submit" class="btn btn-primary">Salvar Alteração</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">Nenhum quarto cadastrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if quartos.has_other_pages %}
+            <nav aria-label="Paginação" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if quartos.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ quartos.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Anterior">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo;</span>
+                    </li>
+                    {% endif %}
+                    
+                    {% for i in quartos.paginator.page_range %}
+                        {% if quartos.number == i %}
+                        <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ i }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if quartos.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ quartos.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Próximo">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&raquo;</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

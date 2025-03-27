@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }} - Pousada Pajeú{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'financeiro:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'quartos:quarto_list' %}">Quartos</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'quartos:limpeza_manutencao_list' %}">Limpeza/Manutenção</a></li>
+                    <li class="breadcrumb-item active">{{ titulo }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{{ titulo }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6>Informações do Quarto</h6>
+                                        <p><strong>Número:</strong> {{ quarto.numero }}</p>
+                                        <p><strong>Categoria:</strong> {{ quarto.categoria.nome }}</p>
+                                        <p><strong>Status atual:</strong> 
+                                            <span class="badge {% if quarto.status == 'disponivel' %}bg-success{% elif quarto.status == 'ocupado' %}bg-danger{% elif quarto.status == 'manutencao' %}bg-warning{% elif quarto.status == 'limpeza' %}bg-info{% endif %}">
+                                                {{ quarto.get_status_display }}
+                                            </span>
+                                        </p>
+                                        <p>
+                                            <strong>Última limpeza:</strong> 
+                                            {% if quarto.data_ultima_limpeza %}
+                                                {{ quarto.data_ultima_limpeza|date:"d/m/Y" }}
+                                            {% else %}
+                                                <span class="text-muted">Não registrada</span>
+                                            {% endif %}
+                                        </p>
+                                        <p>
+                                            <strong>Última manutenção:</strong> 
+                                            {% if quarto.data_ultima_manutencao %}
+                                                {{ quarto.data_ultima_manutencao|date:"d/m/Y" }}
+                                            {% else %}
+                                                <span class="text-muted">Não registrada</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo.id_for_label }}" class="form-label">{{ form.tipo.label }}</label>
+                                {{ form.tipo }}
+                                {% if form.tipo.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.tipo.errors %}
+                                    <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.prioridade.id_for_label }}" class="form-label">{{ form.prioridade.label }}</label>
+                                {{ form.prioridade }}
+                                {% if form.prioridade.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.prioridade.errors %}
+                                    <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.responsavel.id_for_label }}" class="form-label">{{ form.responsavel.label }}</label>
+                                {{ form.responsavel }}
+                                {% if form.responsavel.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.responsavel.errors %}
+                                    <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tempo_estimado.id_for_label }}" class="form-label">{{ form.tempo_estimado.label }}</label>
+                                {{ form.tempo_estimado }}
+                                {% if form.tempo_estimado.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.tempo_estimado.errors %}
+                                    <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.data_agendamento.id_for_label }}" class="form-label">{{ form.data_agendamento.label }}</label>
+                                {{ form.data_agendamento }}
+                                {% if form.data_agendamento.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.data_agendamento.errors %}
+                                    <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.custo.id_for_label }}" class="form-label">{{ form.custo.label }}</label>
+                                {{ form.custo }}
+                                {% if form.custo.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.custo.errors %}
+                                    <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.descricao.id_for_label }}" class="form-label">{{ form.descricao.label }}</label>
+                            {{ form.descricao }}
+                            {% if form.descricao.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.descricao.errors %}
+                                <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.observacoes.id_for_label }}" class="form-label">{{ form.observacoes.label }}</label>
+                            {{ form.observacoes }}
+                            {% if form.observacoes.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.observacoes.errors %}
+                                <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            {{ form.checklist_completo }}
+                            <label class="form-check-label" for="{{ form.checklist_completo.id_for_label }}">
+                                {{ form.checklist_completo.label }}
+                            </label>
+                            {% if form.checklist_completo.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.checklist_completo.errors %}
+                                <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'quartos:limpeza_manutencao_list' %}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Adiciona classes Bootstrap aos campos do formulário
+        document.querySelectorAll('select').forEach(function(el) {
+            el.classList.add('form-select');
+        });
+        
+        document.querySelectorAll('input[type="text"], input[type="number"], input[type="datetime-local"]').forEach(function(el) {
+            el.classList.add('form-control');
+        });
+        
+        document.querySelectorAll('textarea').forEach(function(el) {
+            el.classList.add('form-control');
+        });
+        
+        document.querySelectorAll('input[type="checkbox"]').forEach(function(el) {
+            el.classList.add('form-check-input');
+        });
+    });
+</script>
+{% endblock %} 

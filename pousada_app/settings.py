@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'hospedes',
     'financeiro',
     'website',
+    'notificacoes',
 ]
 
 MIDDLEWARE = [
@@ -61,6 +62,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Ativando o middleware de alertas
     'financeiro.middleware.AlertasMiddleware',
+    # Middleware de notificações
+    'notificacoes.middleware.NotificacoesMiddleware',
 ]
 
 ROOT_URLCONF = 'pousada_app.urls'
@@ -209,6 +212,11 @@ LOGGING = {
             'propagate': False,
         },
         'website': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'notificacoes': {
             'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': False,

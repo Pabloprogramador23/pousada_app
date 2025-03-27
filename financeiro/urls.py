@@ -18,6 +18,7 @@ urlpatterns = [
     path('pagamentos/<int:pk>/rejeitar/', views.rejeitar_pagamento, name='rejeitar_pagamento'),
     path('pagamentos/<int:pk>/estornar/', views.estornar_pagamento, name='estornar_pagamento'),
     path('pagamentos/<int:pk>/recibo/', views.gerar_recibo, name='gerar_recibo'),
+    path('pagamentos/registrar-ajax/', views.registrar_pagamento_ajax, name='registrar_pagamento_ajax'),
     
     # Despesas
     path('despesas/', views.DespesaListView.as_view(), name='despesas'),

@@ -25,7 +25,7 @@ class PagamentoForm(forms.ModelForm):
         
         # Limita as reservas mostradas para aquelas que ainda estão pendentes ou confirmadas
         self.fields['reserva'].queryset = Reserva.objects.filter(
-            status__in=['pendente', 'confirmada']
+            status__in=['pendente', 'confirmada', 'em_andamento']
         )
         
         # Se já existir uma reserva selecionada, define o valor padrão para o valor total dela

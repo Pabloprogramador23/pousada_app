@@ -128,7 +128,7 @@
             <div class="sidebar-heading">Sistema</div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link {% if 'alerta' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'financeiro:alertas' %}">
+                    <a class="nav-link {% if 'alerta' in request.resolver_match.url_name %}active{% endif %}" href="#">
                         <i class="fas fa-bell"></i> Alertas 
                         {% if alertas_nao_visualizados %}
                         <span class="alert-count">{{ alertas_nao_visualizados }}</span>

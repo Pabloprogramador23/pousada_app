@@ -30,13 +30,13 @@ class ReservaForm(forms.ModelForm):
     
     class Meta:
         model = Reserva
-        fields = ['check_in', 'check_out', 'quarto', 'adultos', 'criancas', 'observacoes']
+        fields = ['check_in', 'check_out', 'quarto', 'quantidade_adultos', 'quantidade_criancas', 'observacoes']
         widgets = {
             'check_in': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'check_out': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'quarto': forms.Select(attrs={'class': 'form-control'}),
-            'adultos': forms.Select(attrs={'class': 'form-control'}),
-            'criancas': forms.Select(attrs={'class': 'form-control'}),
+            'quantidade_adultos': forms.Select(attrs={'class': 'form-control'}),
+            'quantidade_criancas': forms.Select(attrs={'class': 'form-control'}),
             'observacoes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 
                                                 'placeholder': 'Observações ou solicitações especiais'})
         }
@@ -45,10 +45,10 @@ class ReservaForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         
         # Opções para número de adultos
-        self.fields['adultos'].widget.choices = [(i, str(i)) for i in range(1, 6)]
+        self.fields['quantidade_adultos'].widget.choices = [(i, str(i)) for i in range(1, 6)]
         
         # Opções para número de crianças
-        self.fields['criancas'].widget.choices = [(i, str(i)) for i in range(0, 4)]
+        self.fields['quantidade_criancas'].widget.choices = [(i, str(i)) for i in range(0, 4)]
         
         # Filtra apenas quartos disponíveis
         self.fields['quarto'].queryset = Quarto.objects.filter(disponivel=True)

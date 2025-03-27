@@ -1,0 +1,289 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Notificações - Pousada Pajéu{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notificacao {
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+    }
+    
+    .notificacao:hover {
+        background-color: rgba(0,0,0,0.03);
+    }
+    
+    .notificacao-info {
+        border-left-color: #0dcaf0;
+    }
+    
+    .notificacao-success {
+        border-left-color: #198754;
+    }
+    
+    .notificacao-warning {
+        border-left-color: #ffc107;
+    }
+    
+    .notificacao-danger {
+        border-left-color: #dc3545;
+    }
+    
+    .notificacao-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .notificacao-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+    }
+    
+    .notificacao-time {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .notificacao-action {
+        margin-top: 0.5rem;
+    }
+    
+    .notificacao-lida {
+        opacity: 0.6;
+    }
+    
+    .nav-pills .nav-link.active {
+        background-color: #0d6efd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-bell me-2"></i> Notificações
+            </h1>
+            <p class="text-muted">Visualize todas as notificações do sistema</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Filtros</h6>
+                </div>
+                <div class="card-body">
+                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        <button class="nav-link active" id="todas-tab" data-bs-toggle="pill" data-bs-target="#todas" type="button" role="tab" aria-controls="todas" aria-selected="true">
+                            Todas
+                            {% if total_nao_lidas > 0 %}
+                            <span class="badge bg-danger float-end">{{ total_nao_lidas }}</span>
+                            {% endif %}
+                        </button>
+                        
+                        <button class="nav-link" id="reservas-tab" data-bs-toggle="pill" data-bs-target="#reservas" type="button" role="tab" aria-controls="reservas" aria-selected="false">
+                            Reservas
+                            {% if contagem_categorias.reserva > 0 %}
+                            <span class="badge bg-danger float-end">{{ contagem_categorias.reserva }}</span>
+                            {% endif %}
+                        </button>
+                        
+                        <button class="nav-link" id="pagamentos-tab" data-bs-toggle="pill" data-bs-target="#pagamentos" type="button" role="tab" aria-controls="pagamentos" aria-selected="false">
+                            Pagamentos
+                            {% if contagem_categorias.pagamento > 0 %}
+                            <span class="badge bg-danger float-end">{{ contagem_categorias.pagamento }}</span>
+                            {% endif %}
+                        </button>
+                        
+                        <button class="nav-link" id="hospedes-tab" data-bs-toggle="pill" data-bs-target="#hospedes" type="button" role="tab" aria-controls="hospedes" aria-selected="false">
+                            Hóspedes
+                            {% if contagem_categorias.hospede > 0 %}
+                            <span class="badge bg-danger float-end">{{ contagem_categorias.hospede }}</span>
+                            {% endif %}
+                        </button>
+                        
+                        <button class="nav-link" id="sistema-tab" data-bs-toggle="pill" data-bs-target="#sistema" type="button" role="tab" aria-controls="sistema" aria-selected="false">
+                            Sistema
+                            {% if contagem_categorias.sistema > 0 %}
+                            <span class="badge bg-danger float-end">{{ contagem_categorias.sistema }}</span>
+                            {% endif %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Lista de Notificações</h6>
+                    <div>
+                        <button class="btn btn-sm btn-outline-secondary" id="btnMarcarTodasLidas">
+                            <i class="fas fa-check-double"></i> Marcar todas como lidas
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="v-pills-tabContent">
+                        <div class="tab-pane fade show active" id="todas" role="tabpanel" aria-labelledby="todas-tab">
+                            {% if notificacoes_nao_lidas %}
+                            <h6 class="border-bottom pb-2 mb-3">Não lidas</h6>
+                            <div class="list-group mb-4">
+                                {% for notificacao in notificacoes_nao_lidas %}
+                                {% include 'notificacoes/partials/notificacao_item.html' %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            
+                            {% if notificacoes_lidas %}
+                            <h6 class="border-bottom pb-2 mb-3">Lidas</h6>
+                            <div class="list-group">
+                                {% for notificacao in notificacoes_lidas %}
+                                {% include 'notificacoes/partials/notificacao_item.html' with is_lida=True %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            
+                            {% if not notificacoes_nao_lidas and not notificacoes_lidas %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> Não há notificações para exibir.
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="tab-pane fade" id="reservas" role="tabpanel" aria-labelledby="reservas-tab">
+                            {% with notificacoes_categoria=notificacoes_nao_lidas|dictsort:"data_criacao"|dictsortreversed:"categoria='reserva'" %}
+                            {% if notificacoes_categoria %}
+                            <div class="list-group">
+                                {% for notificacao in notificacoes_categoria %}
+                                {% include 'notificacoes/partials/notificacao_item.html' %}
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> Não há notificações de reservas para exibir.
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                        
+                        <div class="tab-pane fade" id="pagamentos" role="tabpanel" aria-labelledby="pagamentos-tab">
+                            {% with notificacoes_categoria=notificacoes_nao_lidas|dictsort:"data_criacao"|dictsortreversed:"categoria='pagamento'" %}
+                            {% if notificacoes_categoria %}
+                            <div class="list-group">
+                                {% for notificacao in notificacoes_categoria %}
+                                {% include 'notificacoes/partials/notificacao_item.html' %}
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> Não há notificações de pagamentos para exibir.
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                        
+                        <div class="tab-pane fade" id="hospedes" role="tabpanel" aria-labelledby="hospedes-tab">
+                            {% with notificacoes_categoria=notificacoes_nao_lidas|dictsort:"data_criacao"|dictsortreversed:"categoria='hospede'" %}
+                            {% if notificacoes_categoria %}
+                            <div class="list-group">
+                                {% for notificacao in notificacoes_categoria %}
+                                {% include 'notificacoes/partials/notificacao_item.html' %}
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> Não há notificações de hóspedes para exibir.
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                        
+                        <div class="tab-pane fade" id="sistema" role="tabpanel" aria-labelledby="sistema-tab">
+                            {% with notificacoes_categoria=notificacoes_nao_lidas|dictsort:"data_criacao"|dictsortreversed:"categoria='sistema'" %}
+                            {% if notificacoes_categoria %}
+                            <div class="list-group">
+                                {% for notificacao in notificacoes_categoria %}
+                                {% include 'notificacoes/partials/notificacao_item.html' %}
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> Não há notificações de sistema para exibir.
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Marcar notificação como lida
+        document.querySelectorAll('.btn-marcar-lida').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const id = this.getAttribute('data-id');
+                const url = `/notificacoes/${id}/marcar-como-lida/`;
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Remove o item da lista ou marca como lido
+                        const item = document.querySelector(`.notificacao[data-id="${id}"]`);
+                        item.classList.add('notificacao-lida');
+                        
+                        // Atualiza contadores
+                        const contadores = document.querySelectorAll('.badge');
+                        contadores.forEach(contador => {
+                            const valor = parseInt(contador.textContent);
+                            if (valor > 0) {
+                                contador.textContent = valor - 1;
+                                if (valor - 1 === 0) {
+                                    contador.style.display = 'none';
+                                }
+                            }
+                        });
+                        
+                        // Recarrega a página após um breve delay
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 500);
+                    }
+                });
+            });
+        });
+        
+        // Marcar todas como lidas
+        document.getElementById('btnMarcarTodasLidas').addEventListener('click', function() {
+            const btnsMarcarLida = document.querySelectorAll('.btn-marcar-lida');
+            if (btnsMarcarLida.length === 0) return;
+            
+            if (confirm('Deseja marcar todas as notificações como lidas?')) {
+                // Simula clique em cada botão
+                btnsMarcarLida.forEach(btn => btn.click());
+            }
+        });
+    });
+</script>
+{% endblock %} 

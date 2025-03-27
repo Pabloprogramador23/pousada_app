@@ -10,7 +10,7 @@ from quartos.models import Quarto, CategoriaQuarto
 from hospedes.models import Hospede
 import logging
 import json
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta, datetime, time
 from .forms import ReservaForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
@@ -358,7 +358,8 @@ def realizar_check_in(request, codigo):
     if request.method == 'POST':
         try:
             hora_checkin = request.POST.get('hora_checkin')
-            acompanhantes = request.POST.get('acompanhantes', '0')
+            quantidade_adultos = int(request.POST.get('quantidade_adultos', '1'))
+            quantidade_criancas = int(request.POST.get('quantidade_criancas', '0'))
             forma_pagamento = request.POST.get('forma_pagamento')
             
             # Processa o desconto
@@ -381,8 +382,10 @@ def realizar_check_in(request, codigo):
             reserva.hora_checkin = hora_checkin
             reserva.desconto_diaria = desconto_diaria
             
-            if acompanhantes and acompanhantes.isdigit():
-                reserva.acompanhantes = int(acompanhantes)
+            # Atualiza a quantidade de hóspedes
+            reserva.quantidade_adultos = quantidade_adultos
+            reserva.quantidade_criancas = quantidade_criancas
+            reserva.quantidade_hospedes = quantidade_adultos + quantidade_criancas
                 
             if observacoes:
                 reserva.observacoes = f"{reserva.observacoes or ''}\n\nCheck-in: {observacoes}"
@@ -519,8 +522,8 @@ def processar_check_in_direto(request):
         check_in_date = request.POST.get('check_in')
         check_out_date = request.POST.get('check_out')
         hora_checkin = request.POST.get('hora_checkin')
-        adultos = int(request.POST.get('adultos', 1))
-        criancas = int(request.POST.get('criancas', 0))
+        quantidade_adultos = int(request.POST.get('adultos', 1))
+        quantidade_criancas = int(request.POST.get('criancas', 0))
         
         # Trata valores numéricos com cuidado
         try:
@@ -598,106 +601,105 @@ def processar_check_in_direto(request):
             quarto=quarto,
             check_in__lt=check_out_date_obj,
             check_out__gt=check_in_date_obj,
-            status__in=['pendente', 'confirmada', 'em_andamento']
+            status__in=['confirmada', 'pendente', 'em_andamento']
         )
         
         if reservas_conflitantes.exists():
-            # Para fornecer uma mensagem de erro mais detalhada
-            primeira_reserva = reservas_conflitantes.first()
-            messages.error(
-                request, 
-                f'Quarto {quarto.numero} não está disponível no período selecionado. '
-                f'Já existe uma reserva para {primeira_reserva.hospede.nome} '
-                f'de {primeira_reserva.check_in.strftime("%d/%m/%Y")} '
-                f'até {primeira_reserva.check_out.strftime("%d/%m/%Y")}.'
-            )
+            messages.error(request, f'O quarto {quarto.numero} não está disponível para o período selecionado.')
             return redirect('reservas:check_in_direto')
         
-        # Verifica o status atual do quarto (importante para check-ins no mesmo dia)
-        if check_in_date_obj == hoje and quarto.status != 'disponivel':
-            messages.error(
-                request, 
-                f'O quarto {quarto.numero} está {quarto.get_status_display().lower()} '
-                f'e não pode ser utilizado hoje.'
-            )
-            return redirect('reservas:check_in_direto')
+        # Combina a data com a hora para o check-in
+        hora_minuto = datetime.strptime(hora_checkin, '%H:%M').time() if hora_checkin else time(14, 0)
+        check_in_datetime = datetime.combine(check_in_date_obj, hora_minuto)
+        # Check-out é sempre ao meio-dia
+        check_out_datetime = datetime.combine(check_out_date_obj, time(12, 0))
+        
+        # Total de pessoas
+        total_pessoas = quantidade_adultos + quantidade_criancas
         
         # Cria a reserva
-        reserva = Reserva.objects.create(
-            quarto=quarto,
+        reserva = Reserva(
             hospede=hospede,
-            check_in=check_in_date,
-            check_out=check_out_date,
-            hora_checkin=hora_checkin,
-            adultos=adultos,
-            criancas=criancas,
+            quarto=quarto,
+            check_in=check_in_datetime,
+            check_out=check_out_datetime,
+            status='em_andamento',  # Check-in direto já começa em andamento
+            origem='presencial',
             valor_diaria=valor_diaria,
             desconto_diaria=desconto_diaria,
-            valor_total=valor_pago,
-            status='em_andamento',
-            origem='presencial',
-            confirmada=True,
-            observacoes=observacoes
+            observacoes=observacoes,
+            quantidade_adultos=quantidade_adultos,
+            quantidade_criancas=quantidade_criancas,
+            quantidade_hospedes=total_pessoas
         )
         
-        # Se o check-in é para hoje, atualiza o status do quarto
-        if check_in_date_obj == hoje:
-            quarto.status = 'ocupado'
-            quarto.save()
+        # Calcula o valor total
+        dias_estadia = (check_out_date_obj - check_in_date_obj).days
+        valor_total = (valor_diaria - desconto_diaria) * dias_estadia
+        reserva.valor_total = valor_total
+        
+        # Salva a reserva
+        reserva.save()
         
         # Registra o histórico
+        from reservas.models import Historico
+        
         info_desconto = f", Desconto: R$ {desconto_diaria:.2f} por diária" if desconto_diaria > 0 else ""
         Historico.objects.create(
             reserva=reserva,
-            status_anterior=None,
+            status_anterior='pendente',
             status_novo='em_andamento',
             descricao=f"Check-in direto realizado às {hora_checkin}. Forma de pagamento: {forma_pagamento}. Valor pago: R$ {valor_pago}{info_desconto}"
         )
         
-        # Registra o pagamento no módulo financeiro (se existir)
+        # Registra o pagamento no módulo financeiro
         try:
             from financeiro.models import Pagamento
             Pagamento.objects.create(
                 reserva=reserva,
-                valor=valor_pago,
+                valor=float(valor_pago),
                 forma_pagamento=forma_pagamento,
                 data_pagamento=timezone.now(),
                 status='pago',
-                descricao=f"Pagamento de hospedagem - Check-in direto, reserva {reserva.codigo}"
+                descricao=f"Pagamento de hospedagem - Check-in direto"
             )
             logger.info(f"Pagamento registrado para reserva {reserva.codigo}")
         except (ImportError, Exception) as e:
             logger.warning(f"Não foi possível registrar o pagamento no módulo financeiro: {str(e)}")
         
-        # Cria alerta para limpeza na data de check-out (se o módulo quartos estiver disponível)
+        # Atualiza o status do quarto
+        quarto.status = 'ocupado'
+        quarto.save()
+        
+        # Cria alerta para limpeza na data de check-out
         try:
             from quartos.models import LimpezaManutencao
             from django.contrib.auth.models import User
             
             # Encontra o primeiro usuário admin para ser o responsável
-            admin = User.objects.filter(is_staff=True).first() 
+            admin = User.objects.filter(is_staff=True).first()
             
             LimpezaManutencao.objects.create(
                 quarto=quarto,
                 tipo='limpeza',
-                status='pendente',
+                status='agendada',
                 prioridade='media',
-                data_agendada=reserva.check_out,
+                data_agendamento=check_out_datetime,
                 descricao=f"Limpeza pós check-out da reserva {reserva.codigo}",
-                responsavel=admin
+                responsavel=admin.username if admin else "admin"
             )
             logger.info(f"Tarefa de limpeza agendada para check-out da reserva {reserva.codigo}")
-        except (ImportError, Exception) as e:
+        except Exception as e:
             logger.warning(f"Não foi possível agendar tarefa de limpeza: {str(e)}")
         
-        messages.success(request, f'Check-in direto realizado com sucesso para {hospede.nome}! Código da reserva: {reserva.codigo}')
+        messages.success(request, f'Check-in direto realizado com sucesso para {hospede.nome}!')
         logger.info(f"Check-in direto realizado para reserva {reserva.codigo}")
         
-        return redirect('reservas:check_in')
+        return redirect('financeiro:calendario')
         
     except Exception as e:
+        logger.error(f"Erro ao processar check-in direto: {str(e)}")
         messages.error(request, f'Erro ao processar check-in direto: {str(e)}')
-        logger.error(f"Erro no check-in direto: {str(e)}")
         return redirect('reservas:check_in_direto')
 
 def realizar_check_out(request, codigo):
@@ -850,13 +852,14 @@ def eventos_calendario(request):
 def detalhes_dia(request):
     """
     View para fornecer os detalhes das reservas de um dia específico.
+    Otimizada para reduzir consultas ao banco de dados e melhorar performance.
     """
     data = request.GET.get('data')
     
     try:
         data = datetime.strptime(data, '%Y-%m-%d').date()
         
-        # Busca reservas para o dia
+        # Busca reservas para o dia com seus relacionamentos
         reservas = Reserva.objects.filter(
             check_in__lte=data,
             check_out__gte=data
@@ -866,27 +869,37 @@ def detalhes_dia(request):
         try:
             from financeiro.models import Pagamento
             pagamentos_disponiveis = True
+            
+            # Pré-carregamento de pagamentos em uma única consulta
+            pagamentos = Pagamento.objects.filter(
+                reserva__in=reservas
+            ).values('reserva').annotate(
+                total=models.Sum('valor')
+            )
+            
+            # Mapeamento de pagamentos por reserva
+            pagamentos_por_reserva = {p['reserva']: p['total'] for p in pagamentos}
+            
         except ImportError:
             pagamentos_disponiveis = False
+            pagamentos_por_reserva = {}
         
         # Formata os dados
         reservas_data = []
+        hoje = date.today()
+        
         for reserva in reservas:
             # Determina se a reserva já teve check-in e se pode ter check-out
             tem_checkin = bool(reserva.hora_checkin)
-            pode_checkout = tem_checkin and reserva.status == 'em_andamento' and reserva.check_in <= date.today()
+            pode_checkout = tem_checkin and reserva.status == 'em_andamento' and reserva.check_in <= hoje
             
-            # Calcula pagamentos e saldo, se disponível
-            pagamentos_totais = 0
-            saldo_pendente = 0
+            # Obtém pagamentos e saldo usando o mapeamento pré-carregado
             if pagamentos_disponiveis:
-                try:
-                    pagamentos_totais = Pagamento.objects.filter(reserva=reserva).aggregate(
-                        total=models.Sum('valor')
-                    )['total'] or 0
-                    saldo_pendente = float(reserva.valor_total) - float(pagamentos_totais)
-                except Exception as e:
-                    logger.warning(f"Erro ao calcular pagamentos para reserva {reserva.codigo}: {str(e)}")
+                pagamentos_totais = pagamentos_por_reserva.get(reserva.id, 0)
+                saldo_pendente = float(reserva.valor_total) - float(pagamentos_totais)
+            else:
+                pagamentos_totais = 0
+                saldo_pendente = float(reserva.valor_total)
             
             reservas_data.append({
                 'id': reserva.id,
@@ -905,7 +918,7 @@ def detalhes_dia(request):
                 'tem_checkin': tem_checkin,
                 'pode_checkout': pode_checkout,
                 'pagamentos_totais': float(pagamentos_totais),
-                'saldo_pendente': float(saldo_pendente),
+                'saldo_pendente': saldo_pendente,
                 'tem_saldo_pendente': saldo_pendente > 0,
                 'permite_pagamento': reserva.status in ['pendente', 'confirmada', 'em_andamento']
             })
@@ -1186,7 +1199,7 @@ def registrar_pagamento_ajax(request):
             )
             
             # Também registra como receita, se a reserva estiver em andamento
-            if reserva.status == 'em_andamento':
+            if reserva.status in ['pendente', 'confirmada', 'em_andamento']:
                 try:
                     from financeiro.models import Receita
                     Receita.objects.create(
@@ -1196,7 +1209,7 @@ def registrar_pagamento_ajax(request):
                         status='recebido',
                         data_receita=timezone.now().date(),
                         data_recebimento=timezone.now().date(),
-                        observacoes=f"Pagamento registrado durante a estadia. Forma: {forma_pagamento}. {observacoes}".strip()
+                        observacoes=f"Pagamento registrado para reserva {reserva.get_status_display()}. Forma: {forma_pagamento}. {observacoes}".strip()
                     )
                     logger.info(f"Receita registrada para reserva {reserva.codigo}: R$ {valor}")
                 except Exception as e:
@@ -1209,6 +1222,30 @@ def registrar_pagamento_ajax(request):
                 status_novo=reserva.status,
                 descricao=f"Pagamento de R$ {valor:.2f} registrado. Forma: {forma_pagamento}. {observacoes}"
             )
+            
+            # Cria uma notificação de pagamento recebido
+            try:
+                from notificacoes.models import Notificacao
+                Notificacao.criar_notificacao(
+                    titulo=f"Pagamento recebido - Reserva {reserva.codigo}",
+                    mensagem=f"Pagamento de R$ {valor:.2f} recebido para a reserva {reserva.codigo} ({reserva.hospede.nome}).",
+                    tipo='success',
+                    categoria='pagamento',
+                    obj=reserva,
+                    url_acao=f"/reservas/detalhe/{reserva.codigo}/",
+                    texto_acao="Ver Detalhes"
+                )
+                
+                # Se ainda houver saldo pendente, cria notificação de pagamento pendente
+                novo_total_pago = float(pagamentos_anteriores) + valor
+                valor_restante = float(reserva.valor_total) - novo_total_pago
+                
+                if valor_restante > 0:
+                    Notificacao.notificar_pagamento_pendente(reserva)
+            except ImportError:
+                logger.info("Módulo de notificações não disponível.")
+            except Exception as e:
+                logger.warning(f"Erro ao criar notificação: {str(e)}")
             
             # Retorna informações atualizadas
             novo_total_pago = float(pagamentos_anteriores) + valor
@@ -1239,3 +1276,36 @@ def registrar_pagamento_ajax(request):
             'status': 'error',
             'message': f'Erro ao processar requisição: {str(e)}'
         }, status=500)
+
+class DetalheReservaView(DetailView):
+    """
+    View para exibir os detalhes de uma reserva.
+    """
+    model = Reserva
+    template_name = 'reservas/detalhe_reserva.html'
+    context_object_name = 'reserva'
+    
+    def get_object(self, queryset=None):
+        """
+        Retorna o objeto da reserva baseado no código.
+        """
+        return get_object_or_404(Reserva, codigo=self.kwargs.get('codigo'))
+    
+    def get_context_data(self, **kwargs):
+        """
+        Adiciona dados adicionais ao contexto.
+        """
+        context = super().get_context_data(**kwargs)
+        reserva = self.get_object()
+        
+        # Adiciona histórico da reserva ao contexto
+        context['historico'] = Historico.objects.filter(reserva=reserva).order_by('-data_criacao')
+        
+        # Adiciona pagamentos ao contexto, se disponíveis
+        try:
+            from financeiro.models import Pagamento
+            context['pagamentos'] = Pagamento.objects.filter(reserva=reserva).order_by('-data_pagamento')
+        except ImportError:
+            context['pagamentos'] = []
+        
+        return context

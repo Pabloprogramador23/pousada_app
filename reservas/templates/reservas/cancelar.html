@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cancelar Reserva{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Cancelar Reserva</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">Detalhes da Reserva</h5>
+                        <p><strong>Código:</strong> {{ reserva.codigo }}</p>
+                        <p><strong>Hóspede:</strong> {{ reserva.hospede.nome }}</p>
+                        <p><strong>Quarto:</strong> {{ reserva.quarto.numero }} - {{ reserva.quarto.categoria.nome }}</p>
+                        <p><strong>Check-in:</strong> {{ reserva.check_in|date:"d/m/Y H:i" }}</p>
+                        <p><strong>Check-out:</strong> {{ reserva.check_out|date:"d/m/Y H:i" }}</p>
+                        <p><strong>Valor Total:</strong> R$ {{ reserva.valor_total|floatformat:2 }}</p>
+                        {% if pagamentos %}
+                        <p><strong>Pagamentos realizados:</strong> R$ {{ pagamentos_total|floatformat:2 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <form method="post" action="{% url 'reservas:cancelar' reserva.codigo %}">
+                        {% csrf_token %}
+                        <div class="alert alert-warning">
+                            <p class="fw-bold">ATENÇÃO: Você está prestes a cancelar esta reserva. Esta ação não poderá ser desfeita.</p>
+                            <p>Ao cancelar a reserva:</p>
+                            <ul>
+                                <li>O quarto ficará disponível para as datas da reserva</li>
+                                <li>O cliente será notificado por e-mail</li>
+                                {% if pagamentos %}
+                                <li>Pagamentos já realizados não serão automaticamente reembolsados</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="motivo">Motivo do cancelamento: <span class="text-danger">*</span></label>
+                            <select name="motivo" id="motivo" class="form-select" required>
+                                <option value="">Selecione um motivo...</option>
+                                <option value="solicitacao_cliente">Solicitação do cliente</option>
+                                <option value="no_show">No-show (não comparecimento)</option>
+                                <option value="problemas_pagamento">Problemas com pagamento</option>
+                                <option value="indisponibilidade">Quarto indisponível</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="observacoes">Observações adicionais:</label>
+                            <textarea name="observacoes" id="observacoes" class="form-control" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'financeiro:calendario' %}" class="btn btn-secondary">Voltar</a>
+                            <button type="submit" class="btn btn-danger">Confirmar Cancelamento</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -55,23 +55,49 @@ class Quarto(models.Model):
     STATUS_CHOICES = [
         ('disponivel', 'Disponível'),
         ('ocupado', 'Ocupado'),
-        ('manutencao', 'Em Manutenção'),
-        ('limpeza', 'Em Limpeza'),
-        ('reservado', 'Reservado'),
+        ('manutencao', 'Manutenção'),
+        ('limpeza', 'Em limpeza'),
     ]
     
-    numero = models.CharField(max_length=10, unique=True)
+    TIPO_CHOICES = [
+        ('standard', 'Standard'),
+        ('superior', 'Superior'),
+        ('master', 'Master'),
+        ('deluxe', 'Deluxe'),
+    ]
+    
+    # Identificação
+    numero = models.CharField('Número', max_length=10, unique=True)
+    andar = models.CharField('Andar', max_length=10, blank=True, null=True)
+    tipo = models.CharField('Tipo', max_length=20, choices=TIPO_CHOICES, default='standard')
+    
+    # Características
+    capacidade = models.PositiveSmallIntegerField('Capacidade', default=2)
+    descricao = models.TextField('Descrição', blank=True)
+    
+    # Preços e disponibilidade
+    preco_base = models.DecimalField('Preço Base', max_digits=10, decimal_places=2, default=140.00)
+    status = models.CharField('Status', max_length=20, choices=STATUS_CHOICES, default='disponivel')
+    status_anterior = models.CharField('Status Anterior', max_length=20, null=True, blank=True, editable=False)
+    
+    # Extras e amenidades
+    tem_ar_condicionado = models.BooleanField('Ar condicionado', default=True)
+    tem_tv = models.BooleanField('TV', default=True)
+    tem_frigobar = models.BooleanField('Frigobar', default=True)
+    tem_wifi = models.BooleanField('Wi-Fi', default=True)
+    tem_varanda = models.BooleanField('Varanda', default=False)
+    tem_banheira = models.BooleanField('Banheira', default=False)
+    
+    # Timestamps
+    data_criacao = models.DateTimeField('Data de Criação', auto_now_add=True)
+    data_atualizacao = models.DateTimeField('Data de Atualização', auto_now=True)
+    data_ultima_manutencao = models.DateField('Última Manutenção', null=True, blank=True)
+    data_ultima_limpeza = models.DateField('Última Limpeza', null=True, blank=True)
+    
     categoria = models.ForeignKey(CategoriaQuarto, on_delete=models.PROTECT, related_name='quartos')
-    andar = models.CharField(max_length=1, choices=ANDAR_CHOICES)
     area = models.DecimalField(max_digits=6, decimal_places=2, help_text='Área em metros quadrados')
     preco_diaria = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     disponivel = models.BooleanField(default=True)
-    
-    possui_ar_condicionado = models.BooleanField(default=True)
-    possui_tv = models.BooleanField(default=True)
-    possui_frigobar = models.BooleanField(default=True)
-    possui_cofre = models.BooleanField(default=False)
-    possui_varanda = models.BooleanField(default=False)
     
     # Campo para permitir descontos especiais
     desconto_porcentagem = models.IntegerField(
@@ -81,13 +107,7 @@ class Quarto(models.Model):
     )
     
     observacoes = models.TextField(blank=True, null=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='disponivel')
-    
-    ultima_limpeza = models.DateTimeField(null=True, blank=True)
     proxima_manutencao = models.DateField(null=True, blank=True)
-    
-    data_criacao = models.DateTimeField(auto_now_add=True)
-    data_atualizacao = models.DateTimeField(auto_now=True)
     
     class Meta:
         verbose_name = 'Quarto'
@@ -108,9 +128,16 @@ class Quarto(models.Model):
     
     def save(self, *args, **kwargs):
         """
-        Sobrescreve o método save para registrar no log quando um quarto é criado ou atualizado.
-        Se o preço da diária não estiver definido, usa o preço base da categoria.
+        Sobrescreve o método save para registrar alterações de status
         """
+        # Registra o status anterior para rastreamento de mudanças
+        if self.pk:
+            try:
+                old_instance = Quarto.objects.get(pk=self.pk)
+                self.status_anterior = old_instance.status
+            except Quarto.DoesNotExist:
+                pass
+        
         is_new = self.pk is None
         
         # Define o preço da diária caso não esteja preenchido
@@ -118,6 +145,7 @@ class Quarto(models.Model):
             self.preco_diaria = self.categoria.preco_base
             
         # Atualiza o campo disponível com base no status
+        # Disponível apenas se status for 'disponivel'
         self.disponivel = (self.status == 'disponivel')
         
         # Validar desconto máximo

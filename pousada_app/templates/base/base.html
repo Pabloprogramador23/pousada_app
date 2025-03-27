@@ -41,6 +41,22 @@
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'contato' %}active{% endif %}" href="{% url 'website:contato' %}">Contato</a>
                         </li>
+                        
+                        {% if user.is_authenticated %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle position-relative" href="#" id="notificacoesBotao" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-bell"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <div class="dropdown-item text-center">Notificações do sistema</div>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="{% url 'admin:index' %}">
+                                        <i class="fas fa-cog"></i> Configurações
+                                    </a>
+                                </div>
+                            </li>
+                        {% endif %}
+                        
                         <li class="nav-item">
                             <a class="nav-link btn btn-warning text-dark ms-2" href="{% url 'reservas:criar' %}">Reservar</a>
                         </li>
