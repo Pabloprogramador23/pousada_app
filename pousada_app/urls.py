@@ -21,12 +21,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('website.urls')),  # URLs do site principal
+    path('api/', include('reservas.urls')),
     path('reservas/', include('reservas.urls')),  # URLs do módulo financeiro
     path('quartos/', include('quartos.urls')),  # URLs do módulo de quartos
     path('hospedes/', include('hospedes.urls')),
 ]
-
-# Configuração para servir arquivos de mídia em ambiente de desenvolvimento
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

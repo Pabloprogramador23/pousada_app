@@ -1,12 +1,10 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import HospedeViewSet
 
-app_name = 'hospedes'
+router = DefaultRouter()
+router.register(r'hospedes', HospedeViewSet)
 
 urlpatterns = [
-    # URL base para listagem de hóspedes
-    path('', views.lista_hospedes, name='lista_hospedes'),
-    
-    # Detalhes de hóspede específico
-    path('<int:hospede_id>/', views.detalhes_hospede, name='detalhes_hospede'),
-] 
+    path('', include(router.urls)),
+]
