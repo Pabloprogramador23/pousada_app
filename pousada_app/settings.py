@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'hospedes',
     'financeiro',
     'website',
-    'notificacoes',
 ]
 
 MIDDLEWARE = [
@@ -60,10 +59,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # Ativando o middleware de alertas
-    'financeiro.middleware.AlertasMiddleware',
-    # Middleware de notificações
-    'notificacoes.middleware.NotificacoesMiddleware',
 ]
 
 ROOT_URLCONF = 'pousada_app.urls'
@@ -71,7 +66,7 @@ ROOT_URLCONF = 'pousada_app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'pousada_app', 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

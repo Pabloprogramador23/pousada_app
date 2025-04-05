@@ -1,5 +1,5 @@
 from django.utils.deprecation import MiddlewareMixin
-from .models import Alerta
+#from .models import Alerta
 
 class AlertasMiddleware(MiddlewareMixin):
     """

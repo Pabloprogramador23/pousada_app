@@ -27,4 +27,5 @@ urlpatterns = [
     path('cancelar-reserva-ajax/', views.cancelar_reserva_ajax, name='cancelar_reserva_ajax'),
     path('checkout-reserva-ajax/', views.checkout_reserva_ajax, name='checkout_reserva_ajax'),
     path('registrar-pagamento-ajax/', views.registrar_pagamento_ajax, name='registrar_pagamento_ajax'),
+    path('nova/', views.NovaReservaView.as_view(), name='nova_reserva'),
 ] 
